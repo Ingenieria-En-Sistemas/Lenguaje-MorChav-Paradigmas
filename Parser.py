@@ -1,9 +1,5 @@
 # Importa el lexer (debe estar definido previamente)
 from Lexer import lexer
-
-# Lista de tokens generados por el lexer
-tokens = lexer("3+4*10-20")
-
 # Clase Node para construir el árbol de sintaxis abstracta (AST)
 class Node:
     def __init__(self, type, children=None, value=None):
@@ -78,6 +74,3 @@ def parse(tokens):
 def p_statement_valar(p):
     'statement : VALAR LPAREN STRING RPAREN'
     print(p[3][1:-1])
-# Prueba del parser
-ast = parse(tokens)
-print(ast)

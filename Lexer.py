@@ -1,6 +1,18 @@
 import re
 
-from tokens import tokens
+# Lista de tokens
+tokens = [
+    ('NUMBER', r'\d+'),
+    ('PLUS', r'\+'),
+    ('MINUS', r'-'),
+    ('TIMES', r'\*'),
+    ('DIVIDE', r'/'),
+    ('LPAREN', r'\('),
+    ('RPAREN', r'\)'),
+    ('VALAR', r'valar'),
+    ('STRING', r'"[^"]*"'),
+    ('SEMICOLON', r';'),
+]
 
 # Clase Token para almacenar información sobre cada token
 class Token:
@@ -21,7 +33,8 @@ def lexer(input_string):
             match = regex.match(input_string, pos)
             if match:
                 value = match.group(0)
-                token_list.append(Token(token_type, value))
+                if token_type != 'WHITESPACE':  # Ignorar espacios en blanco
+                    token_list.append(Token(token_type, value))
                 pos = match.end()
                 break
 
@@ -30,4 +43,3 @@ def lexer(input_string):
             return None
 
     return token_list
-

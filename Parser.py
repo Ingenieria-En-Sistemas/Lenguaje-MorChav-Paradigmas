@@ -1,5 +1,6 @@
 # Importa el lexer (debe estar definido previamente)
 from Lexer import lexer
+
 # Clase Node para construir el árbol de sintaxis abstracta (AST)
 class Node:
     def __init__(self, type, children=None, value=None):
@@ -44,13 +45,25 @@ def factor(tokens):
             tokens.pop(0)  # Consume el paréntesis derecho
         return expr
     else:
-        raise SyntaxError("Error de sintaxis")
-
-# Función principal para el parser
-# ...
+        raise SyntaxError("Error de sintaxis: Se esperaba un punto y coma al final de la instrucción.")
 
 # Función para el símbolo no terminal "sentencia"
 def parse(tokens):
+    statements = []
+
+    while tokens:
+        statement = parse_single_statement(tokens)
+        statements.append(statement)
+
+        if tokens:
+            if tokens[0].type == 'SEMICOLON':
+                tokens.pop(0)  # Consume el punto y coma
+            else:
+                raise SyntaxError("Error de sintaxis: Se esperaba un punto y coma al final de la instrucción.")
+
+    return statements
+
+def parse_single_statement(tokens):
     if tokens[0].type == 'VALAR':
         tokens.pop(0)  # Consume 'VALAR'
         if tokens[0].type == 'LPAREN':
@@ -69,7 +82,6 @@ def parse(tokens):
 
     # Si no es una sentencia 'valar', se asume que es una expresión
     return expression(tokens)
-
 
 def p_statement_valar(p):
     'statement : VALAR LPAREN STRING RPAREN'

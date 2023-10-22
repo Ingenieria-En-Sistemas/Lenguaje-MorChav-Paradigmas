@@ -17,7 +17,7 @@ def evaluate(node):
         return evaluate(node.children[0]) / evaluate(node.children[1])
 
 # Prueba del intérprete
-input_expr = "3 + 5 * (2 - 1)"
+input_expr = "3+4*10-20"
 tokens = lexer(input_expr)
 ast = parse(tokens)
 result = evaluate(ast)

@@ -1,5 +1,5 @@
 # Importa el lexer (debe estar definido previamente)
-from lexer import lexer
+from Lexer import lexer
 
 # Lista de tokens generados por el lexer
 tokens = lexer("3+4*10-20")

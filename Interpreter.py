@@ -2,7 +2,6 @@
 from Lexer import lexer
 from Parser import parse
 
-
 # Función para evaluar el AST
 def evaluate(node):
     if node.type == 'NUMBER':
@@ -15,6 +14,9 @@ def evaluate(node):
         return evaluate(node.children[0]) * evaluate(node.children[1])
     if node.type == 'DIVIDE':
         return evaluate(node.children[0]) / evaluate(node.children[1])
+    if node.type == 'VALAR':
+        print(node.value)  # Imprimir el valor de cadena
+    return None
 
 # Prueba del intérprete
 while True:

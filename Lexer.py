@@ -9,6 +9,8 @@ tokens = [
     ('DIVIDE', r'/'),
     ('LPAREN', r'\('),
     ('RPAREN', r'\)'),
+    ('VALAR', r'valar'),
+    ('STRING', r'"[^"]*"'),
 ]
 
 # Clase Token para almacenar información sobre cada token
@@ -40,9 +42,3 @@ def lexer(input_string):
 
     return token_list
 
-# Prueba del lexer
-data = "3+4*10-20"
-token_list = lexer(data)
-if token_list:
-    for token in token_list:
-        print(f"Token: {token.type}, Valor: {token.value}")

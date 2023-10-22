@@ -5,6 +5,7 @@ tokens = {
     "MINUS": r"-", # Operador resta
     "LPAREN": r"\(", # Paréntesis izquierdo
     "RPAREN": r"\)", # Paréntesis derecho
+
 }
 
 # Definir una clase para representar los tokens
@@ -54,6 +55,6 @@ def get_tokens(text):
     return tokens
 
 # Probar las funciones con un ejemplo
-text = "(12+34)-56"
+text = "(12+34)-56 valar(\"Hola, mundo\")"
 tokens = get_tokens(text)
 print(tokens)

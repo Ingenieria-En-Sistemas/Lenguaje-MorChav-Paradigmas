@@ -17,8 +17,14 @@ def evaluate(node):
         return evaluate(node.children[0]) / evaluate(node.children[1])
 
 # Prueba del intérprete
-input_expr = "3+4*10-20"
-tokens = lexer(input_expr)
-ast = parse(tokens)
-result = evaluate(ast)
-print(f"Resultado: {result}")
+while True:
+    input_expr = input("Ingrese una expresión aritmética (o 'exit' para salir): ")
+    if input_expr == 'exit':
+        break
+    tokens = lexer(input_expr)
+    ast = parse(tokens)
+    if ast:
+        result = evaluate(ast)
+        print(f"Resultado: {result}")
+    else:
+        print("Error de sintaxis. Intente nuevamente.")

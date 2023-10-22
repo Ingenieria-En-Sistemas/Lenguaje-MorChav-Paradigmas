@@ -64,7 +64,7 @@ def parse(tokens):
     return statements
 
 def parse_single_statement(tokens):
-    if tokens[0].type == 'VALAR':
+    if tokens[0].type == 'DRACARYS':
         tokens.pop(0)  # Consume 'VALAR'
         if tokens[0].type == 'LPAREN':
             tokens.pop(0)  # Consume '('
@@ -72,17 +72,17 @@ def parse_single_statement(tokens):
                 value = tokens.pop(0).value[1:-1]  # Elimina comillas dobles del valor de cadena
                 if tokens[0].type == 'RPAREN':
                     tokens.pop(0)  # Consume ')'
-                    return Node('VALAR', value=value)
+                    return Node('DRACARYS', value=value)
                 else:
                     raise SyntaxError("Error de sintaxis: Se esperaba ')' después del valor de cadena.")
             else:
                 raise SyntaxError("Error de sintaxis: Se esperaba un valor de cadena después de '('.")
         else:
-            raise SyntaxError("Error de sintaxis: Se esperaba '(' después de 'VALAR'.")
+            raise SyntaxError("Error de sintaxis: Se esperaba '(' después de 'DRACARYS'.")
 
     # Si no es una sentencia 'valar', se asume que es una expresión
     return expression(tokens)
 
 def p_statement_valar(p):
-    'statement : VALAR LPAREN STRING RPAREN'
+    'statement : DRACARYS LPAREN STRING RPAREN'
     print(p[3][1:-1])

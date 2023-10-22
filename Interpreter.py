@@ -23,7 +23,7 @@ def evaluate_single(node):
         return evaluate_single(node.children[0]) * evaluate_single(node.children[1])
     if node.type == 'DIVIDE':
         return evaluate_single(node.children[0]) / evaluate_single(node.children[1])
-    if node.type == 'VALAR':
+    if node.type == 'DRACARYS':
         print(node.value)  # Imprimir el valor de cadena
     return None
 

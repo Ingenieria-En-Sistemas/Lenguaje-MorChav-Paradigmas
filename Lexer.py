@@ -9,7 +9,7 @@ tokens = [
     ('DIVIDE', r'/'),
     ('LPAREN', r'\('),
     ('RPAREN', r'\)'),
-    ('VALAR', r'valar'),
+    ('DRACARYS', r'dracarys'),
     ('STRING', r'"[^"]*"'),
     ('SEMICOLON', r';'),
 ]

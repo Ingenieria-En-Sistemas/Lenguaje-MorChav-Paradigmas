@@ -1,6 +1,6 @@
 # Importa el lexer y el parser (deben estar definidos previamente)
 from Lexer import lexer
-from Parser import parse
+from Parser import parse_program
 
 # Función para evaluar el AST
 def evaluate(nodes):
@@ -13,33 +13,56 @@ def evaluate(nodes):
     return results
 
 def evaluate_single(node):
+    if isinstance(node, list):
+        results = []
+        for child in node:
+            result = evaluate_single(child)
+            if result is not None:
+                results.append(result)
+        return results
+
     if node.type == 'NUMBER':
         return node.value
     if node.type == 'PLUS':
-        return evaluate_single(node.children[0]) + evaluate_single(node.children[1])
+        left = evaluate_single(node.children[0])
+        right = evaluate_single(node.children[1])
+        return left + right
     if node.type == 'MINUS':
-        return evaluate_single(node.children[0]) - evaluate_single(node.children[1])
+        left = evaluate_single(node.children[0])
+        right = evaluate_single(node.children[1])
+        return left - right
     if node.type == 'TIMES':
-        return evaluate_single(node.children[0]) * evaluate_single(node.children[1])
+        left = evaluate_single(node.children[0])
+        right = evaluate_single(node.children[1])
+        return left * right
     if node.type == 'DIVIDE':
-        return evaluate_single(node.children[0]) / evaluate_single(node.children[1])
+        left = evaluate_single(node.children[0])
+        right = evaluate_single(node.children[1])
+        return left / right
     if node.type == 'DRACARYS':
-        print(node.value)  # Imprimir el valor de cadena
+        return node.value
+    if node.type == 'IF':
+        condition = evaluate_single(node.children[0])
+        if condition:
+            return evaluate_single(node.children[1])
+        elif len(node.children) == 3:
+            return evaluate_single(node.children[2])
     return None
+
 
 # Prueba del intérprete
 while True:
-    input_expr = input("Ingrese una expresión aritmética (o 'exit' para salir): ")
+    input_expr = input("Ingrese una expresión condicional (o 'exit' para salir): ")
     if input_expr == 'exit':
         break
     input_expr = input_expr.strip()  # Elimina espacios en blanco al inicio y al final
-    """if not input_expr.endswith(";"):
-        print("Error de sintaxis: Se esperaba un punto y coma al final de la instrucción.")
-        continue"""
     tokens = lexer(input_expr)
-    ast = parse(tokens)
+    ast = parse_program(tokens)
     if ast:
         result = evaluate(ast)
-        print(f"Resultado: {result[0]}")
+        if result is not None:
+            # El resultado puede ser una lista de resultados, imprime cada uno
+            for res in result:
+                print(f"Resultado: {res}")
     else:
         print("Error de sintaxis. Intente nuevamente.")

@@ -9,9 +9,22 @@ tokens = [
     ('DIVIDE', r'/'),
     ('LPAREN', r'\('),
     ('RPAREN', r'\)'),
+    ('LBRACE', r'\{'),
+    ('RBRACE', r'\}'),
     ('DRACARYS', r'dracarys'),
-    ('STRING', r'"[^"]*"'),
-    """('SEMICOLON', r';'),"""
+    ('DRACARYS', r'DRACARYS'),
+    ('STRING', r'\'[^\']*\'|"[^"]*"'),
+    ('IF', r'if'),
+    ('ELSE', r'else'),
+    ('WHITESPACE', r'\s+'),
+    ('EQUALS', r'=='),
+    ('NOTEQUAL', r'!='),
+    ('LESSTHAN', r'<'),
+    ('GREATERTHAN', r'>'),
+    ('LESSEQUAL', r'<='),
+    ('GREATEQUAL', r'>='),
+    ('ASSIGN', r'='),
+    ('ENDIF', r'(?i)endif')
 ]
 
 # Clase Token para almacenar información sobre cada token

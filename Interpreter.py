@@ -33,9 +33,9 @@ while True:
     if input_expr == 'exit':
         break
     input_expr = input_expr.strip()  # Elimina espacios en blanco al inicio y al final
-    if not input_expr.endswith(";"):
+    """if not input_expr.endswith(";"):
         print("Error de sintaxis: Se esperaba un punto y coma al final de la instrucción.")
-        continue
+        continue"""
     tokens = lexer(input_expr)
     ast = parse(tokens)
     if ast:

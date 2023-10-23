@@ -11,7 +11,7 @@ tokens = [
     ('RPAREN', r'\)'),
     ('DRACARYS', r'dracarys'),
     ('STRING', r'"[^"]*"'),
-    ('SEMICOLON', r';'),
+    """('SEMICOLON', r';'),"""
 ]
 
 # Clase Token para almacenar información sobre cada token

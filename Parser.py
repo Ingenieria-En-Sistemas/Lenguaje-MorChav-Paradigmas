@@ -55,11 +55,11 @@ def parse(tokens):
         statement = parse_single_statement(tokens)
         statements.append(statement)
 
-        if tokens:
+        """if tokens:
             if tokens[0].type == 'SEMICOLON':
                 tokens.pop(0)  # Consume el punto y coma
             else:
-                raise SyntaxError("Error de sintaxis: Se esperaba un punto y coma al final de la instrucción.")
+                raise SyntaxError("Error de sintaxis: Se esperaba un punto y coma al final de la instrucción.")"""
 
     return statements
 

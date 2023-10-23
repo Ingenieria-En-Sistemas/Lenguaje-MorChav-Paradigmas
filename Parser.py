@@ -13,8 +13,20 @@ class Node:
 
 # Función para el símbolo no terminal "expresión"
 def expression(tokens):
-    left = equality(tokens)
-    return left
+    if tokens[0].type == 'TRUE':
+        tokens.pop(0)  # Consume 'TRUE'
+        return True
+    elif tokens[0].type == 'FALSE':
+        tokens.pop(0)  # Consume 'FALSE'
+        return False
+    elif tokens[0].type == 'NUMBER':
+        return int(tokens.pop(0).value)
+    elif tokens[0].type == 'LPAREN':
+        tokens.pop(0)  # Consume el paréntesis izquierdo
+        expr = condition(tokens)
+        if tokens[0].type == 'RPAREN':
+            tokens.pop(0)  # Consume el paréntesis derecho
+        return expr
 
 # Función para el símbolo no terminal "igualdad"
 def equality(tokens):
@@ -118,6 +130,34 @@ def parse_program(tokens):
 
     return statements
 
+# Función para el símbolo no terminal "condición"
+# Función para el símbolo no terminal "condición"
+def condition(tokens):
+    left = expression(tokens)
+
+    if tokens and tokens[0].type in ('EQUALS', 'NOTEQUAL', 'LESSTHAN', 'GREATERTHAN', 'LESSEQUAL', 'GREATEQUAL'):
+        op = tokens.pop(0)
+        right = expression(tokens)
+
+        if op.type == 'EQUALS':
+            return left == right
+        elif op.type == 'NOTEQUAL':
+            return left != right
+        elif op.type == 'LESSTHAN':
+            return left < right
+        elif op.type == 'GREATERTHAN':
+            return left > right
+        elif op.type == 'LESSEQUAL':
+            return left <= right
+        elif op.type == 'GREATEQUAL':
+            return left >= right
+
+    return left
+
+
+# Función para el símbolo no terminal "expresión"
+
+
 # Función para el símbolo no terminal "sentencia"
 def parse_single_statement(tokens):
     if tokens[0].type == 'IF':
@@ -128,27 +168,31 @@ def parse_single_statement(tokens):
         return parse_dracarys(tokens)
     elif tokens[0].type == 'LBRACE':
         return parse_block(tokens)
-
-    # Si no es una sentencia 'IF', 'ELSE', 'DRACARYS' o bloque, se asume que es una expresión
     return expression(tokens)
+
 
 def parse_if_statement(tokens):
     tokens.pop(0)  # Consume 'IF'
-    condition = expression(tokens)
-    if_statement = parse_single_statement(tokens)
-    else_statement = None  # Inicialmente, no hay un 'ELSE' statement
+    condition_value = condition(tokens)
+    true_branch = parse_single_statement(tokens)
+    false_branch = None
 
     # Comprueba si hay 'ELSE'
     if tokens and tokens[0].type == 'ELSE':
         tokens.pop(0)  # Consume 'ELSE'
-        else_statement = parse_single_statement(tokens)
+        false_branch = parse_single_statement(tokens)
 
     # Busca 'ENDIF' sin importar los espacios en blanco
     if tokens and tokens[0].type == 'ENDIF':
         tokens.pop(0)  # Consume 'ENDIF'
-        return Node('IF', [condition, if_statement, else_statement])
+        if condition_value:
+            return true_branch
+        else:
+            if false_branch:
+                return false_branch
 
     raise SyntaxError("Error de sintaxis: Se esperaba 'ENDIF' al final de la declaración condicional.")
+
 
 def parse_else_statement(tokens):
     tokens.pop(0)  # Consume 'ELSE'
@@ -169,7 +213,7 @@ def print_ast(node, level=0):
 
 
 # Ejemplo de entrada
-entrada_ejemplo = "if (2!=3) {dracarys('Verdad')} else {dracarys('Falso')} endif"
+entrada_ejemplo = "if (3==3) {dracarys('Verdad')} else {dracarys('Falso')} endif"
 
 # Llama al lexer con el ejemplo de entrada
 tokens_ejemplo = lexer(entrada_ejemplo)

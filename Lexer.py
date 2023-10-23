@@ -24,7 +24,9 @@ tokens = [
     ('LESSEQUAL', r'<='),
     ('GREATEQUAL', r'>='),
     ('ASSIGN', r'='),
-    ('ENDIF', r'(?i)endif')
+    ('ENDIF', r'(?i)endif'),
+    ('TRUE', r'True'),
+    ('FALSE', r'False'),
 ]
 
 # Clase Token para almacenar información sobre cada token

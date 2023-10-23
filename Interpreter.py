@@ -40,13 +40,14 @@ def evaluate_single(node):
         right = evaluate_single(node.children[1])
         return left / right
     if node.type == 'DRACARYS':
-        return node.value
+        return node.value  # Devuelve el valor de cadena
     if node.type == 'IF':
         condition = evaluate_single(node.children[0])
         if condition:
             return evaluate_single(node.children[1])
-        elif len(node.children) == 3:
-            return evaluate_single(node.children[2])
+        else:
+            if len(node.children) == 3:
+                return evaluate_single(node.children[2])
     return None
 
 
@@ -62,7 +63,11 @@ while True:
         result = evaluate(ast)
         if result is not None:
             # El resultado puede ser una lista de resultados, imprime cada uno
-            for res in result:
-                print(f"Resultado: {res}")
+            if isinstance(result, list):
+                for res in result:
+                    if res is not None:
+                        print(f"Resultado: {res}")
+            else:
+                print(f"Resultado: {result}")
     else:
         print("Error de sintaxis. Intente nuevamente.")

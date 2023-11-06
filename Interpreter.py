@@ -48,21 +48,3 @@ def evaluate_single(node):
         elif len(node.children) == 3:
             return evaluate_single(node.children[2])
     return None
-
-
-# Prueba del intérprete
-while True:
-    input_expr = input("Ingrese una expresión condicional (o 'exit' para salir): ")
-    if input_expr == 'exit':
-        break
-    input_expr = input_expr.strip()  # Elimina espacios en blanco al inicio y al final
-    tokens = lexer(input_expr)
-    ast = parse_program(tokens)
-    if ast:
-        result = evaluate(ast)
-        if result is not None:
-            # El resultado puede ser una lista de resultados, imprime cada uno
-            for res in result:
-                print(f"Resultado: {res}")
-    else:
-        print("Error de sintaxis. Intente nuevamente.")

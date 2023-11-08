@@ -169,7 +169,7 @@ def print_ast(node, level=0):
 
 
 # Ejemplo de entrada
-entrada_ejemplo = "if (2!=3) {dracarys('Verdad')} else {dracarys('Falso')} endif"
+entrada_ejemplo = "if ('a'!='b') {dracarys('Verdad')} else {dracarys('Falso')} endif"
 
 # Llama al lexer con el ejemplo de entrada
 tokens_ejemplo = lexer(entrada_ejemplo)

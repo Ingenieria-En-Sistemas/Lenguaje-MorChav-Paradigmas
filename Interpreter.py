@@ -39,6 +39,14 @@ def evaluate_single(node):
         left = evaluate_single(node.children[0])
         right = evaluate_single(node.children[1])
         return left / right
+    if node.type == 'NOTEQUAL':
+        left = evaluate_single(node.children[0])
+        right = evaluate_single(node.children[1])
+        return left != right
+    if node.type == 'EQUALS':
+        left = evaluate_single(node.children[0])
+        right = evaluate_single(node.children[1])
+        return left == right
     if node.type == 'DRACARYS':
         return node.value
     if node.type == 'IF':

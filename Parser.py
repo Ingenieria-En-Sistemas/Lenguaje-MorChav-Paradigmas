@@ -13,20 +13,35 @@ class Node:
 
 class ForNode:
     def __init__(self, variable, initial_value, final_value, step, body):
-        self.type = 'FOR'  # Agrega el atributo 'type'
+        self.type = 'FOR'
         self.variable = variable
         self.initial_value = initial_value
         self.final_value = final_value
         self.step = step
         self.body = body
 
+# Diccionario para rastrear las variables y sus valores
+variables = {}
+
+# Función para el símbolo no terminal "programa"
 # Función para el símbolo no terminal "programa"
 def parse_program(tokens):
     statements = []
     while tokens:
-        statement = parse_single_statement(tokens)
-        statements.append(statement)
+        if tokens[0].type == 'TYPE':
+            # Si el token actual es una declaración de variable, procesarla como tal
+            variable_declaration = parse_variable_declaration(tokens)
+            statements.append(variable_declaration)
+        elif tokens[0].type == 'FOR':
+            # Si el token actual es un bucle FOR, procesarlo como tal
+            for_statement = parse_for_statement(tokens)
+            statements.append(for_statement)
+        else:
+            # De lo contrario, procesar la sentencia como una expresión
+            statement = expression(tokens)
+            statements.append(statement)
     return statements
+
 
 # Función para el símbolo no terminal "sentencia"
 def parse_single_statement(tokens):
@@ -39,9 +54,37 @@ def parse_single_statement(tokens):
     elif tokens[0].type == 'LBRACE':
         return parse_block(tokens)
     elif tokens[0].type == 'FOR':
-        return parse_for_statement(tokens)  # Llama a la función para analizar un bucle FOR
+        return parse_for_statement(tokens)
+    elif tokens[0].type == 'TYPE':  # Identifica las declaraciones de variables
+        return parse_variable_declaration(tokens)
     return expression(tokens)
 
+# Función para analizar la declaración de una variable
+def parse_variable_declaration(tokens):
+    var_type = tokens.pop(0).value  # Tipo de variable (int, string, etc.)
+    variable_name = tokens.pop(0).value  # Nombre de la variable
+    if tokens[0].type == 'ASSIGN':
+        tokens.pop(0)  # Consume '='
+        value = expression(tokens)
+        variables[variable_name] = value
+        return Node('VARIABLE_DECLARATION', children=[
+            Node('TYPE', value=var_type),
+            Node('VARIABLE', value=variable_name),
+            Node('ASSIGN'),
+            value
+        ])
+    else:
+        raise SyntaxError("Error de sintaxis: Se esperaba '=' después del nombre de la variable.")
+
+
+# Función para analizar una referencia a una variable
+def parse_variable_reference(tokens):
+    variable_name = tokens.pop(0).value
+    if variable_name in variables:
+        return variables[variable_name]
+    else:
+        raise NameError(f"La variable '{variable_name}' no está definida.")
+    
 # Función para analizar un bucle FOR
 def parse_for_statement(tokens):
     tokens.pop(0)  # Consume 'FOR'
@@ -223,7 +266,7 @@ def print_ast(node, level=0):
 
 
 # Ejemplo de entrada con un bucle FOR
-entrada_ejemplo = "if(3==3){dracarys(3+4)}else{dracarys(4+5)}endif"
+entrada_ejemplo = """if (2 + 2 == 4) {dracarys("Dracarys!")"""
 
 # Llama al lexer con el ejemplo de entrada
 tokens_ejemplo = lexer(entrada_ejemplo)

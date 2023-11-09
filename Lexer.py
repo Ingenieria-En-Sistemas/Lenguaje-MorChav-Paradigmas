@@ -17,9 +17,12 @@ tokens = [
     ('STRING', r'\'[^\']*\'|"[^"]*"'),
     ('IF', r'if'),
     ('ELSE', r'else'),
+    ('FOR', r'FOR'),
     ('FOR', r'for'),
     ('TO', r'to'),
+    ('TYPE', r'int|float|string|bool'),
     ('VARIABLE', r'[a-zA-Z_][a-zA-Z0-9_]*'),  
+    ('ASSIGN', r'='),
     ('STEP', r'step'),
     ('WHITESPACE', r'\s+'),
     ('EQUALS', r'=='),
@@ -27,8 +30,8 @@ tokens = [
     ('LESSTHAN', r'<'),
     ('GREATERTHAN', r'>'),
     ('LESSEQUAL', r'<='),
-    ('GREATEQUAL', r'>='),
-    ('ASSIGN', r'=')
+    ('GREATEQUAL', r'>=')
+   
     
 ]
 

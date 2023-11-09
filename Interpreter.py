@@ -58,13 +58,19 @@ def evaluate_single(node):
         right = evaluate_single(node.children[1])
         return left == right
     if node.type == 'DRACARYS':
-        dracarys_content = node.value
-        try:
-            # Use ast.literal_eval to evaluate the content of DRACARYS
-            result = ast.literal_eval(dracarys_content)
-            return result
-        except (ValueError, SyntaxError) as e:
-            return f"Error: {str(e)}"
+        # Consulta el primer hijo del nodo 'DRACARYS'
+        if node.children and len(node.children) > 0:
+            dracarys_content = evaluate_single(node.children[0])
+            return dracarys_content
+        else:
+            return None  # Maneja el caso en el que no hay hijos
+    if node.type == 'STRING':
+        # Procesa el contenido del nodo 'STRING'
+        string_content = node.value
+        if string_content and (string_content[0] == string_content[-1] and (string_content[0] == '"' or string_content[0] == "'")):
+            return string_content[1:-1]  # Quita las comillas iniciales y finales
+        else:
+            return string_content  # Devuelve el contenido sin comillas si no están presentes
     if node.type == 'IF':
         condition = evaluate_single(node.children[0])
         if condition:
@@ -72,3 +78,5 @@ def evaluate_single(node):
         elif len(node.children) == 3:
             return evaluate_single(node.children[2])
     return None
+
+

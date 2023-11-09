@@ -23,7 +23,7 @@ def execute_expression():
             if result is not None:
                 output_text.configure(state="normal")
                 output_text.delete("1.0", "end")
-                output_text.insert("1.0", f"Resultado: {result}\n")
+                output_text.insert("1.0", f"{result}\n")
                 output_text.configure(state="disabled")
             else:
                 output_text.configure(state="normal")
@@ -52,7 +52,7 @@ app = customtkinter.CTk() # crear ventana CTk como se hace con la ventana Tk
 app.title("MorChav IDE")
 
 # Ajustar el tamaño de la ventana
-app.geometry("1000x400")
+app.geometry("1000x625")
 
 # Crear un contenedor para los botones y centrarlos
 button_container = customtkinter.CTkFrame(app)
@@ -67,7 +67,8 @@ run_icon = ImageTk.PhotoImage(run_icon)
 clear_icon = ImageTk.PhotoImage(clear_icon)
 
 # Crear un campo de entrada de texto desplazable más grande
-input_text = customtkinter.CTkTextbox(app, wrap=customtkinter.WORD, width=600, height=150)
+input_text = customtkinter.CTkTextbox(app, wrap=customtkinter.WORD, width=500, height=350)
+input_text.configure(font=("Consolas", 17)) 
 input_text.pack(padx=10, pady=(10, 5), fill="both")  # Aumenta la altura y ajusta el relleno vertical
 
 # Crea el botón para ejecutar la expresión con el icono
@@ -79,7 +80,8 @@ clear_button = customtkinter.CTkButton(button_container, text="Limpiar", image=c
 clear_button.pack(side="left", padx=10)  # Alinea el botón "Limpiar" a la izquierda
 
 # Crear un campo de salida de texto desplazable más grande
-output_text = customtkinter.CTkTextbox(app, state="disabled", wrap=customtkinter.WORD, width=60, height=150)
+output_text = customtkinter.CTkTextbox(app, state="disabled", wrap=customtkinter.WORD, width=60, height=200)
+output_text.configure(font=("Consolas", 17)) 
 output_text.pack(padx=10, pady=(5, 10), fill="both")  # Aumenta la altura y ajusta el relleno vertical
 
 # Ejecutar la aplicación

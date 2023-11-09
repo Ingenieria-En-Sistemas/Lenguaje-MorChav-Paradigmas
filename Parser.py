@@ -36,11 +36,16 @@ def parse_program(tokens):
             # Si el token actual es un bucle FOR, procesarlo como tal
             for_statement = parse_for_statement(tokens)
             statements.append(for_statement)
+        elif tokens[0].type == 'IF':
+            # Si el token actual es una expresión condicional (if), procesarlo como tal
+            if_statement = parse_if_statement(tokens)
+            statements.append(if_statement)
         else:
             # De lo contrario, procesar la sentencia como una expresión
-            statement = expression(tokens)
+            statement = parse_single_statement(tokens)
             statements.append(statement)
     return statements
+
 
 
 # Función para el símbolo no terminal "sentencia"
@@ -183,16 +188,30 @@ def multiplication(tokens):
         left = Node(op.type, [left, right])
     return left
 
-# Función para el símbolo no terminal "factor"
 def factor(tokens):
     if tokens[0].type == 'NUMBER':
         return Node('NUMBER', value=int(tokens.pop(0).value))
     elif tokens[0].type == 'LPAREN':
         tokens.pop(0)  # Consume el paréntesis izquierdo
-        expr = expression(tokens)
-        if tokens[0].type == 'RPAREN':
-            tokens.pop(0)  # Consume el paréntesis derecho
-        return expr
+        if tokens[0].type == 'IF':
+            # Manejar una expresión condicional (if)
+            condition = expression(tokens)
+            if tokens[0].type == 'RPAREN':
+                tokens.pop(0)  # Consume el paréntesis derecho
+                # Manejar las ramas "THEN" y "ELSE" si fuera necesario
+                then_expression = factor(tokens)
+                if tokens[0].type == 'ELSE':
+                    tokens.pop(0)  # Consume 'ELSE'
+                    else_expression = factor(tokens)
+                    return Node('IF', children=[condition, then_expression, else_expression])
+                return Node('IF', children=[condition, then_expression])
+            else:
+                raise SyntaxError("Error de sintaxis: Se esperaba ')' después de la condición en la expresión condicional.")
+        else:
+            expr = expression(tokens)
+            if tokens[0].type == 'RPAREN':
+                tokens.pop(0)  # Consume el paréntesis derecho
+            return expr
     elif tokens[0].type == 'DRACARYS':
         return parse_dracarys(tokens)
     elif tokens[0].type == 'STRING':
@@ -200,6 +219,7 @@ def factor(tokens):
     elif tokens[0].type == 'VARIABLE':
         return Node('VARIABLE', value=tokens.pop(0).value)
     raise SyntaxError(f"Error de sintaxis: Token inesperado '{tokens[0].type}' en factor.")
+
 
 
 
@@ -266,7 +286,7 @@ def print_ast(node, level=0):
 
 
 # Ejemplo de entrada con un bucle FOR
-entrada_ejemplo = """if (2 + 2 == 4) {dracarys("Dracarys!")"""
+entrada_ejemplo = """dracarys("hola")"""
 
 # Llama al lexer con el ejemplo de entrada
 tokens_ejemplo = lexer(entrada_ejemplo)

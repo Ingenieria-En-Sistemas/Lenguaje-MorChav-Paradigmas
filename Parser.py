@@ -176,8 +176,12 @@ def addition(tokens):
     while tokens and tokens[0].type in ('PLUS', 'MINUS'):
         op = tokens.pop(0)
         right = multiplication(tokens)
-        left = Node(op.type, [left, right])
+        if op.type == 'PLUS':
+            left = Node('PLUS', [left, right])
+        else:
+            left = Node('MINUS', [left, right])
     return left
+
 
 # Función para el símbolo no terminal "término"
 def multiplication(tokens):
@@ -231,7 +235,8 @@ def parse_dracarys(tokens):
         expression_node = expression(tokens)
         if tokens[0].type == 'RPAREN':
             tokens.pop(0)  # Consume ')'
-            return Node('DRACARYS', children=[expression_node])
+            result_node = Node('DRACARYS', children=[expression_node])
+            return result_node
         else:
             raise SyntaxError("Error de sintaxis: Se esperaba ')' después de la expresión.")
     elif tokens[0].type == 'STRING':
@@ -239,6 +244,7 @@ def parse_dracarys(tokens):
         return Node('DRACARYS', value=string_node)
     else:
         raise SyntaxError("Error de sintaxis: Se esperaba '(' o una cadena después de 'DRACARYS'.")
+
 
 
 # Función para el símbolo no terminal "bloque"
@@ -286,7 +292,9 @@ def print_ast(node, level=0):
 
 
 # Ejemplo de entrada con un bucle FOR
-entrada_ejemplo = """dracarys("hola")"""
+entrada_ejemplo = """int a = 2
+int b = 3
+dracarys(a + b)"""
 
 # Llama al lexer con el ejemplo de entrada
 tokens_ejemplo = lexer(entrada_ejemplo)

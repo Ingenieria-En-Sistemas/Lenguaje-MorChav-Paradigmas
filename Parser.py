@@ -11,15 +11,6 @@ class Node:
         else:
             self.children = []
         self.value = value
-class ForNode:
-    def __init__(self, variable, initial_value, final_value, step, body):
-        self.type = "FOR"
-        self.variable = variable
-        self.initial_value = initial_value
-        self.final_value = final_value
-        self.step = step
-        self.body = body
-        self.children = [self.variable, self.initial_value, self.final_value, self.step, self.body]
 
 
 # Diccionario para rastrear las variables y sus valores
@@ -337,35 +328,21 @@ def parse_block(tokens):
 
 
 def print_ast(node, level=0):
-    if isinstance(node, list):
-        for item in node:
-            print_ast(item, level)
-    else:
-        if node is None:
-            return
-        if isinstance(node,ForNode):
-            print("  " * level + node.type)
-            print("  " * (level + 1) + f"Variable: {node.variable}")
-            print("  " * (level + 1) + f"Initial Value: {node.initial_value.value}")
-            print("  " * (level + 1) + f"Final Value: {node.final_value.value}")
-            print("  " * (level + 1) + f"Step: {node.step}")
-            print("  " * (level + 1) + "Body:")
-            if isinstance(node.body, list):
-                for child in node.body:
-                    print_ast(
-                        child, level + 2
-                    )  # Imprime los elementos del cuerpo del bucle FOR
-            else:
-                print_ast(node.body, level + 2)  # Imprime el cuerpo del bucle FOR
-        else:
-            print("  " * level + node.type + (f" ({node.value})" if node.value else ""))
+    if isinstance(node, Node):
+        print("  " * level + node.type + (f" ({node.value})" if node.value else ""))
         if hasattr(node, "children"):
             for child in node.children:
                 print_ast(child, level + 1)
+    elif isinstance(node, list):
+        for item in node:
+            print_ast(item, level)
+    else:
+        print("  " * level + str(node))
+
 
 
 # Ejemplo de entrada con un bucle FOR
-entrada_ejemplo = """int a = 1 
+entrada_ejemplo = """for (int i = 1 to 10 step 3) dracarys(2 + i)
 """
 
 # Llama al lexer con el ejemplo de entrada

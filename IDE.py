@@ -1,9 +1,14 @@
-import tkinter as tk
-from tkinter import scrolledtext  # Importa scrolledtext para el campo de entrada de texto
-from tkinter import Text  # Importa Text para el campo de salida
+import customtkinter
+from tkinter import PhotoImage
 from Lexer import lexer
 from Parser import parse_program
 from Interpreter import evaluate
+from customtkinter import CTkImage  # Importar CTkImage desde customtkinter
+from PIL import Image
+import random
+
+customtkinter.set_appearance_mode("System")
+customtkinter.set_default_color_theme("dark-blue")
 
 def execute_expression():
     input_expr = input_text.get("1.0", "end-1c")
@@ -18,58 +23,84 @@ def execute_expression():
             # Intérprete
             result = evaluate(ast)
             if result is not None:
-                output_text.config(state="normal")
+                output_text.configure(state="normal")
                 output_text.delete("1.0", "end")
-                output_text.insert("1.0", f"Resultado: {result}\n")
-                output_text.config(state="disabled")
+                output_text.insert("1.0", f"{result}\n")
+                output_text.configure(state="disabled")
             else:
-                output_text.config(state="normal")
+                output_text.configure(state="normal")
                 output_text.delete("1.0", "end")
                 output_text.insert("1.0", "Error al evaluar la expresión.\n")
-                output_text.config(state="disabled")
+                output_text.configure(state="disabled")
         else:
-            output_text.config(state="normal")
+            output_text.configure(state="normal")
             output_text.delete("1.0", "end")
             output_text.insert("1.0", "Error de sintaxis. Intente nuevamente.\n")
-            output_text.config(state="disabled")
+            output_text.configure(state="disabled")
     except Exception as e:
-        output_text.config(state="normal")
+        output_text.configure(state="normal")
         output_text.delete("1.0", "end")
         output_text.insert("1.0", f"Error: {e}\n")
-        output_text.config(state="disabled")
+        output_text.configure(state="disabled")
 
 def clear_input():
     input_text.delete("1.0", "end")
-    output_text.config(state="normal")
+    output_text.configure(state="normal")
     output_text.delete("1.0", "end")
-    output_text.config(state="disabled")
+    output_text.configure(state="disabled")
+
+# Lista de títulos aleatorios
+random_titles = [
+    "El odio es bueno si nos hace seguir adelante. (Sandor ‘El Perro’ Clegane)",
+    "Cuando se juega al Juego de Tronos, solo se puede ganar o morir. (Cersei Lannister)",
+    "Los dioses no tienen piedad, por eso son dioses. (Cersei Lannister)",
+    "Las serpientes enfadadas atacan. Eso hace más fácil aplastar sus cabezas. (Daenerys Targaryen)",
+    "Cualquier hombre que deba decir ‘soy el rey’, no es un verdadero rey. (Tywin Lannister)",
+]
+
+# Función para cambiar el título de la ventana
+def change_window_title():
+    new_title = random.choice(random_titles)
+    app.title(new_title)
 
 # Configurar la ventana principal
-root = tk.Tk()
-root.title("MorChav IDE")
+app = customtkinter.CTk()
+app.geometry("1000x625")
+app.iconbitmap("drake.ico")
 
-# Ajustar el tamaño de la ventana
-root.geometry("1000x500")
+# Crear un contenedor para los botones y centrarlos
+button_container = customtkinter.CTkFrame(app)
+button_container.pack()
 
-# Crear una etiqueta para la entrada
-input_label = tk.Label(root, text="Ingrese una expresión:")
-input_label.pack()
+# Cargar las imágenes como CTkImage y ajustar el tamaño
+run_image = Image.open("run.png")  # Reemplaza con la ubicación de tu icono "Ejecutar"
+run_icon = CTkImage(dark_image=run_image, size=(50, 50))  # Ajusta el tamaño a 32x32 píxeles
 
-# Crear un campo de entrada de texto desplazable
-input_text = scrolledtext.ScrolledText(root, wrap=tk.WORD, width=40, height=10)
-input_text.pack(padx=10, pady=10, fill="both")
+clear_image = Image.open("clear.png")  # Reemplaza con la ubicación de tu icono "Limpiar"
+clear_icon = CTkImage(dark_image=clear_image, size=(50, 50))  # Ajusta el tamaño a 32x32 píxeles
 
-# Crear un botón para ejecutar la expresión
-execute_button = tk.Button(root, text="Ejecutar", command=execute_expression)
-execute_button.pack()
+# Crear un campo de entrada de texto desplazable más grande
+input_text = customtkinter.CTkTextbox(app, wrap=customtkinter.WORD, width=500, height=350)
+input_text.configure(font=("Consolas", 17))
+input_text.pack(padx=10, pady=(10, 5), fill="both")
 
-# Crear un botón para limpiar el campo de entrada y el campo de salida
-clear_button = tk.Button(root, text="Limpiar", command=clear_input)
-clear_button.pack()
+# Crea el botón para ejecutar la expresión con el icono
+execute_button = customtkinter.CTkButton(button_container, text="Run", image=run_icon, compound="left", command=execute_expression)
+execute_button.configure(font=("Consolas", 17))
+execute_button.pack(side="left", padx=10)
 
-# Crear un campo de salida de texto desplazable
-output_text = Text(root, state="disabled", wrap=tk.WORD, width=40, height=10)
-output_text.pack(padx=10, pady=10, fill="both")
+# Crea el botón para limpiar el campo de entrada y el campo de salida con el icono
+clear_button = customtkinter.CTkButton(button_container, text="Clean", image=clear_icon, compound="left", command=clear_input)
+clear_button.configure(font=("Consolas", 17))
+clear_button.pack(side="left", padx=10)
+
+# Crear un campo de salida de texto desplazable más grande
+output_text = customtkinter.CTkTextbox(app, state="disabled", wrap=customtkinter.WORD, width=60, height=200)
+output_text.configure(font=("Consolas", 17))
+output_text.pack(padx=10, pady=(5, 10), fill="both")
+
+# Carga y cambia el título de la ventana al iniciar
+change_window_title()
 
 # Ejecutar la aplicación
-root.mainloop()
+app.mainloop()

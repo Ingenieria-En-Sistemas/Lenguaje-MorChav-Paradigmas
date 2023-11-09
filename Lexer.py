@@ -4,6 +4,7 @@ import re
 tokens = [
     ('NUMBER', r'\d+'),
     ('PLUS', r'\+'),
+    ('ENDIF', r'(?i)endif'),
     ('MINUS', r'-'),
     ('TIMES', r'\*'),
     ('DIVIDE', r'/'),
@@ -15,18 +16,24 @@ tokens = [
     ('DRACARYS', r'DRACARYS'),
     ('STRING', r'\'[^\']*\'|"[^"]*"'),
     ('IF', r'if'),
+    ('IF', r'IF'),
     ('ELSE', r'else'),
-    ('WHITESPACE', r'\s+'),
+    ('FOR', r'FOR'),
+    ('FOR', r'for'),
+    ('TO', r'to'),
+    ('TYPE', r'int|float|string|bool'),
+    ('VARIABLE', r'[a-zA-Z_][a-zA-Z0-9_]*'),  
     ('EQUALS', r'=='),
+    ('ASSIGN', r'='),
+    ('STEP', r'step'),
+    ('WHITESPACE', r'\s+'),
     ('NOTEQUAL', r'!='),
     ('LESSTHAN', r'<'),
     ('GREATERTHAN', r'>'),
     ('LESSEQUAL', r'<='),
-    ('GREATEQUAL', r'>='),
-    ('ASSIGN', r'='),
-    ('ENDIF', r'(?i)endif'),
-    ('TRUE', r'True'),
-    ('FALSE', r'False'),
+    ('GREATEQUAL', r'>=')
+   
+    
 ]
 
 # Clase Token para almacenar información sobre cada token

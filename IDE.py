@@ -6,7 +6,7 @@ from Parser import parse_program
 from Interpreter import evaluate
 
 def execute_expression():
-    input_expr = input_text.get("1.0", "end-1c")  # Obtiene el texto desde la línea 1, caracter 0 hasta el final menos el último carácter
+    input_expr = input_text.get("1.0", "end-1c")
     try:
         # Lexer
         tokens = lexer(input_expr)
@@ -18,10 +18,10 @@ def execute_expression():
             # Intérprete
             result = evaluate(ast)
             if result is not None:
-                output_text.config(state="normal")  # Habilita la edición para escribir en el widget de salida
-                output_text.delete("1.0", "end")  # Borra el texto existente
-                output_text.insert("1.0", f"Resultado: {result[0]}\n")  # Inserta el nuevo resultado
-                output_text.config(state="disabled")  # Deshabilita la edición nuevamente
+                output_text.config(state="normal")
+                output_text.delete("1.0", "end")
+                output_text.insert("1.0", f"Resultado: {result[0]}\n")
+                output_text.config(state="disabled")
             else:
                 output_text.config(state="normal")
                 output_text.delete("1.0", "end")
@@ -37,6 +37,12 @@ def execute_expression():
         output_text.delete("1.0", "end")
         output_text.insert("1.0", f"Error: {e}\n")
         output_text.config(state="disabled")
+
+def clear_input():
+    input_text.delete("1.0", "end")
+    output_text.config(state="normal")
+    output_text.delete("1.0", "end")
+    output_text.config(state="disabled")
 
 # Configurar la ventana principal
 root = tk.Tk()
@@ -56,6 +62,10 @@ input_text.pack(padx=10, pady=10, fill="both")
 # Crear un botón para ejecutar la expresión
 execute_button = tk.Button(root, text="Ejecutar", command=execute_expression)
 execute_button.pack()
+
+# Crear un botón para limpiar el campo de entrada y el campo de salida
+clear_button = tk.Button(root, text="Limpiar", command=clear_input)
+clear_button.pack()
 
 # Crear un campo de salida de texto desplazable
 output_text = Text(root, state="disabled", wrap=tk.WORD, width=40, height=10)

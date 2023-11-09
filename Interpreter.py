@@ -43,6 +43,14 @@ def evaluate_single(node):
         left = evaluate_single(node.children[0])
         right = evaluate_single(node.children[1])
         return left != right
+    if node.type == 'LESSTHAN':
+        left = evaluate_single(node.children[0])
+        right = evaluate_single(node.children[1])
+        return left < right
+    if node.type == 'GREATERTHAN':
+        left = evaluate_single(node.children[0])
+        right = evaluate_single(node.children[1])
+        return left > right
     if node.type == 'EQUALS':
         left = evaluate_single(node.children[0])
         right = evaluate_single(node.children[1])

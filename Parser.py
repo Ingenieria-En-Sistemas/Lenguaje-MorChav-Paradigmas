@@ -11,8 +11,6 @@ class Node:
         else:
             self.children = []
         self.value = value
-
-
 class ForNode:
     def __init__(self, variable, initial_value, final_value, step, body):
         self.type = "FOR"
@@ -21,6 +19,7 @@ class ForNode:
         self.final_value = final_value
         self.step = step
         self.body = body
+        self.children = [self.variable, self.initial_value, self.final_value, self.step, self.body]
 
 
 # Diccionario para rastrear las variables y sus valores
@@ -100,51 +99,66 @@ def parse_variable_reference(tokens):
         raise NameError(f"La variable '{variable_name}' no está definida.")
 
 
-# Función para analizar un bucle FOR
+# ...
+
 def parse_for_statement(tokens):
     tokens.pop(0)  # Consume 'FOR'
-    if tokens[0].type == "LPAREN":  # Corrige el token esperado
+    if tokens[0].type == "LPAREN":
         tokens.pop(0)  # Consume '('
-        variable = tokens.pop(0)
-        if variable.type == "VARIABLE":
+        if tokens[0].type == "TYPE":
+            var_type = tokens.pop(0).value  # Tipo de variable (int, string, etc.)
+            variable = tokens.pop(0).value  # Nombre de la variable
+            initial_value = None  # Inicialmente, no hay valor asignado
+
             if tokens[0].type == "ASSIGN":
                 tokens.pop(0)  # Consume '='
-                initial_value = expression(tokens)
+                if tokens[0].type == "NUMBER":
+                    initial_value = expression(tokens)  
+                else:
+                    raise SyntaxError("Error de sintaxis: Se esperaba un número como valor inicial en la definición del bucle FOR.")
+
                 if tokens[0].type == "TO":
                     tokens.pop(0)  # Consume 'TO'
                     final_value = expression(tokens)
-                    step = 1  # Valor por defecto para el paso
-                    if tokens and tokens[0].type == "STEP":
+                    step = None
+                    if tokens[0].type == "STEP":
                         tokens.pop(0)  # Consume 'STEP'
-                        step = int(
-                            tokens.pop(0).value
-                        )  # Convierte el valor del token en un número entero
+                        step = expression(tokens)
                     if tokens[0].type == "RPAREN":
-                        tokens.pop(0)  # Consume ')'  # Corrige el token esperado
+                        tokens.pop(0)  # Consume ')'
                         body = parse_single_statement(tokens)
-                        return ForNode(
-                            variable.value, initial_value, final_value, step, body
+
+                        # Asignar el valor inicial solo si se proporcionó
+                        if initial_value:
+                            variables[variable] = initial_value.value  # Almacenar el valor numérico
+
+                        # Crear un nodo 'FOR' utilizando la clase 'Node'
+                        return Node(
+                            "FOR",
+                            children=[
+                                Node("VARIABLE_DECLARATION", children=[
+                                    Node("TYPE", value=var_type),
+                                    Node("VARIABLE", value=variable),
+                                    initial_value,  # Agregar el valor inicial directamente
+                                ]),
+                                Node("FINAL_VALUE", value=final_value.value),
+                                Node("STEP", value=step.value if step else None),
+                                body
+                            ]
                         )
                     else:
-                        raise SyntaxError(
-                            "Error de sintaxis: Se esperaba ')' al final del bucle FOR."
-                        )
+                        raise SyntaxError("Error de sintaxis: Se esperaba ')' al final del bucle FOR.")
                 else:
-                    raise SyntaxError(
-                        "Error de sintaxis: Se esperaba 'TO' en la definición del bucle FOR."
-                    )
+                    raise SyntaxError("Error de sintaxis: Se esperaba 'TO' en la definición del bucle FOR.")
             else:
-                raise SyntaxError(
-                    "Error de sintaxis: Se esperaba '=' en la definición del bucle FOR."
-                )
+                raise SyntaxError("Error de sintaxis: Se esperaba '=' en la definición del bucle FOR.")
         else:
-            raise SyntaxError(
-                "Error de sintaxis: Se esperaba un nombre de variable en la definición del bucle FOR."
-            )
+            raise SyntaxError("Error de sintaxis: Se esperaba el tipo de variable en la definición del bucle FOR.")
     else:
-        raise SyntaxError(
-            "Error de sintaxis: Se esperaba '(' en la definición del bucle FOR."
-        )
+        raise SyntaxError("Error de sintaxis: Se esperaba '(' en la definición del bucle FOR.")
+
+
+
 
 
 def parse_if_statement(tokens):
@@ -313,7 +327,7 @@ def print_ast(node, level=0):
     else:
         if node is None:
             return
-        if isinstance(node, ForNode):
+        if isinstance(node,ForNode):
             print("  " * level + node.type)
             print("  " * (level + 1) + f"Variable: {node.variable}")
             print("  " * (level + 1) + f"Initial Value: {node.initial_value.value}")
@@ -335,9 +349,8 @@ def print_ast(node, level=0):
 
 
 # Ejemplo de entrada con un bucle FOR
-entrada_ejemplo = """int a = 2
-int b = 3
-dracarys(a + b)"""
+entrada_ejemplo = """for (int i = 1 to 10 step 3) dracarys(2 + i)
+"""
 
 # Llama al lexer con el ejemplo de entrada
 tokens_ejemplo = lexer(entrada_ejemplo)

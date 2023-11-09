@@ -1,7 +1,5 @@
-# Importa el lexer y el parser (deben estar definidos previamente)
 from Lexer import lexer
 from Parser import parse_program
-import ast
 
 # Diccionario para rastrear las variables y sus valores
 variables = {}
@@ -61,7 +59,25 @@ def evaluate_single(node):
         left = evaluate_single(node.children[0])
         right = evaluate_single(node.children[1])
         return left == right
-    if node.type == "DRACARYS":
+    if node.type == "FOR":
+        variable_name = node.children[0].children[1].value
+        initial_value = node.children[0].children[2].value  # El valor inicial es un nodo
+        final_value = node.children[1].value
+        step = node.children[2].value
+        body = node.children[3]  # El cuerpo del bucle
+
+        # Lista para almacenar los resultados de las iteraciones
+        results = []
+
+        for i in range(initial_value, final_value + 1, step):
+            # Agregar la variable de control al diccionario de variables
+            variables[variable_name] = i
+            result = evaluate_single(body)
+            results.append(result)
+
+        return results  # Devolver la lista de resultados de las iteraciones
+
+    elif node.type == "DRACARYS":
         if node.children:
             dracarys_content = evaluate_single(node.children[0])
             return dracarys_content
@@ -98,3 +114,14 @@ def evaluate_single(node):
         if variable_name in variables:
             return variables[variable_name]
     return None
+
+
+# Código de prueba
+program = """
+for (int i = 1 to 10 step 2) dracarys(2 + i)
+"""
+tokens = lexer(program)
+ast = parse_program(tokens)
+results = evaluate(ast)  # Ahora devuelve una lista de resultados
+for result in results:
+    print(result)

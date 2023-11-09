@@ -20,7 +20,7 @@ def execute_expression():
             if result is not None:
                 output_text.config(state="normal")
                 output_text.delete("1.0", "end")
-                output_text.insert("1.0", f"Resultado: {result[0]}\n")
+                output_text.insert("1.0", f"Resultado: {result}\n")
                 output_text.config(state="disabled")
             else:
                 output_text.config(state="normal")

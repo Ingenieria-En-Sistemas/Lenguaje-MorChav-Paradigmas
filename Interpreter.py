@@ -5,16 +5,16 @@ from Parser import parse_program
 # Diccionario para rastrear las variables y sus valores
 variables = {}
 
-# Función para evaluar el AST
 def evaluate(nodes):
-    results = []
+    last_result = None  # Variable para almacenar el valor del último nodo visitado
 
     for node in nodes:
         result = evaluate_single(node)
         if result is not None:
-            results.append(result)
+            last_result = result
 
-    return results
+    return last_result
+
 
 import ast
 
@@ -62,8 +62,11 @@ def evaluate_single(node):
         right = evaluate_single(node.children[1])
         return left == right
     if node.type == 'DRACARYS':
-        dracarys_content = evaluate_single(node.children[0])  # Evalúa la expresión dentro de DRACARYS
-        return dracarys_content
+        if node.children:
+            dracarys_content = evaluate_single(node.children[0])
+            return dracarys_content
+        elif node.value:  # Manejar el caso donde DRACARYS es una variable
+            return evaluate_single(node.value)
     if node.type == 'STRING':
         string_content = node.value
         if string_content and (string_content[0] == string_content[-1] and (string_content[0] == '"' or string_content[0] == "'")):

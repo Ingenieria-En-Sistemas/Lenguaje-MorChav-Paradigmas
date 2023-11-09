@@ -1,4 +1,5 @@
 import customtkinter
+from tkinter import PhotoImage
 from Lexer import lexer
 from Parser import parse_program
 from Interpreter import evaluate
@@ -65,6 +66,7 @@ def change_window_title():
 # Configurar la ventana principal
 app = customtkinter.CTk()
 app.geometry("1000x625")
+app.iconbitmap("drake.ico")
 
 # Crear un contenedor para los botones y centrarlos
 button_container = customtkinter.CTkFrame(app)
@@ -72,10 +74,10 @@ button_container.pack()
 
 # Cargar las imágenes como CTkImage y ajustar el tamaño
 run_image = Image.open("run.png")  # Reemplaza con la ubicación de tu icono "Ejecutar"
-run_icon = CTkImage(light_image=run_image, size=(50, 50))  # Ajusta el tamaño a 32x32 píxeles
+run_icon = CTkImage(dark_image=run_image, size=(50, 50))  # Ajusta el tamaño a 32x32 píxeles
 
 clear_image = Image.open("clear.png")  # Reemplaza con la ubicación de tu icono "Limpiar"
-clear_icon = CTkImage(light_image=clear_image, size=(50, 50))  # Ajusta el tamaño a 32x32 píxeles
+clear_icon = CTkImage(dark_image=clear_image, size=(50, 50))  # Ajusta el tamaño a 32x32 píxeles
 
 # Crear un campo de entrada de texto desplazable más grande
 input_text = customtkinter.CTkTextbox(app, wrap=customtkinter.WORD, width=500, height=350)

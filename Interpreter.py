@@ -12,6 +12,8 @@ def evaluate(nodes):
 
     return results
 
+import ast
+
 def evaluate_single(node):
     if isinstance(node, list):
         results = []
@@ -56,7 +58,13 @@ def evaluate_single(node):
         right = evaluate_single(node.children[1])
         return left == right
     if node.type == 'DRACARYS':
-        return node.value
+        dracarys_content = node.value
+        try:
+            # Use ast.literal_eval to evaluate the content of DRACARYS
+            result = ast.literal_eval(dracarys_content)
+            return result
+        except (ValueError, SyntaxError) as e:
+            return f"Error: {str(e)}"
     if node.type == 'IF':
         condition = evaluate_single(node.children[0])
         if condition:

@@ -11,111 +11,21 @@ class Node:
             self.children = []
         self.value = value
 
-# Función para el símbolo no terminal "expresión"
-def expression(tokens):
-    left = equality(tokens)
-    return left
-
-# Función para el símbolo no terminal "igualdad"
-def equality(tokens):
-    left = comparison(tokens)
-
-    while tokens and tokens[0].type in ('EQUALS', 'NOTEQUAL'):
-        op = tokens.pop(0)
-        right = comparison(tokens)
-        left = Node(op.type, [left, right])
-
-    return left
-
-# Función para el símbolo no terminal "comparación"
-def comparison(tokens):
-    left = addition(tokens)
-
-    while tokens and tokens[0].type in ('LESSTHAN', 'GREATERTHAN', 'LESSEQUAL', 'GREATEQUAL'):
-        op = tokens.pop(0)
-        right = addition(tokens)
-        left = Node(op.type, [left, right])
-
-    return left
-
-# Función para el símbolo no terminal "suma"
-def addition(tokens):
-    left = multiplication(tokens)
-
-    while tokens and tokens[0].type in ('PLUS', 'MINUS'):
-        op = tokens.pop(0)
-        right = multiplication(tokens)
-        left = Node(op.type, [left, right])
-
-    return left
-
-# Función para el símbolo no terminal "término"
-def multiplication(tokens):
-    left = factor(tokens)
-
-    while tokens and tokens[0].type in ('TIMES', 'DIVIDE'):
-        op = tokens.pop(0)
-        right = factor(tokens)
-        left = Node(op.type, [left, right])
-
-    return left
-
-# Función para el símbolo no terminal "factor"
-def factor(tokens):
-    if tokens[0].type == 'NUMBER':
-        return Node('NUMBER', value=int(tokens.pop(0).value))
-    elif tokens[0].type == 'LPAREN':
-        tokens.pop(0)  # Consume el paréntesis izquierdo
-        expr = expression(tokens)
-        if tokens[0].type == 'RPAREN':
-            tokens.pop(0)  # Consume el paréntesis derecho
-        return expr
-    elif tokens[0].type == 'DRACARYS':
-        return parse_dracarys(tokens)
-
-    raise SyntaxError(f"Error de sintaxis: Token inesperado '{tokens[0].type}' en factor.")
-
-# Función para el símbolo no terminal "DRACARYS"
-def parse_dracarys(tokens):
-    tokens.pop(0)  # Consume 'DRACARYS'
-    if tokens[0].type == 'LPAREN':
-        tokens.pop(0)  # Consume '('
-        if tokens[0].type == 'STRING':
-            value = tokens.pop(0).value[1:-1]  # Elimina comillas del valor de cadena
-            if tokens[0].type == 'RPAREN':
-                tokens.pop(0)  # Consume ')'
-                return Node('DRACARYS', value=value)
-            else:
-                raise SyntaxError("Error de sintaxis: Se esperaba ')' después del valor de cadena.")
-        else:
-            raise SyntaxError("Error de sintaxis: Se esperaba un valor de cadena después de '('.")
-    else:
-        raise SyntaxError("Error de sintaxis: Se esperaba '(' después de 'DRACARYS'.")
-
-# Función para el símbolo no terminal "bloque"
-def parse_block(tokens):
-    tokens.pop(0)  # Consume '{'
-    statements = []
-
-    while tokens and tokens[0].type != 'RBRACE':
-        statement = parse_single_statement(tokens)
-        statements.append(statement)
-
-    if tokens and tokens[0].type == 'RBRACE':
-        tokens.pop(0)  # Consume '}'
-    else:
-        raise SyntaxError("Error de sintaxis: Falta '}' al final del bloque.")
-
-    return statements
+class ForNode:
+    def __init__(self, variable, initial_value, final_value, step, body):
+        self.type = 'FOR'  # Agrega el atributo 'type'
+        self.variable = variable
+        self.initial_value = initial_value
+        self.final_value = final_value
+        self.step = step
+        self.body = body
 
 # Función para el símbolo no terminal "programa"
 def parse_program(tokens):
     statements = []
-
     while tokens:
         statement = parse_single_statement(tokens)
         statements.append(statement)
-
     return statements
 
 # Función para el símbolo no terminal "sentencia"
@@ -128,10 +38,43 @@ def parse_single_statement(tokens):
         return parse_dracarys(tokens)
     elif tokens[0].type == 'LBRACE':
         return parse_block(tokens)
-
-    # Si no es una sentencia 'IF', 'ELSE', 'DRACARYS' o bloque, se asume que es una expresión
+    elif tokens[0].type == 'FOR':
+        return parse_for_statement(tokens)  # Llama a la función para analizar un bucle FOR
     return expression(tokens)
 
+# Función para analizar un bucle FOR
+def parse_for_statement(tokens):
+    tokens.pop(0)  # Consume 'FOR'
+    if tokens[0].type == 'LPAREN':  # Corrige el token esperado
+        tokens.pop(0)  # Consume '('
+        variable = tokens.pop(0)
+        if variable.type == 'VARIABLE':
+            if tokens[0].type == 'ASSIGN':
+                tokens.pop(0)  # Consume '='
+                initial_value = expression(tokens)
+                if tokens[0].type == 'TO':
+                    tokens.pop(0)  # Consume 'TO'
+                    final_value = expression(tokens)
+                    step = 1  # Valor por defecto para el paso
+                    if tokens and tokens[0].type == 'STEP':
+                        tokens.pop(0)  # Consume 'STEP'
+                        step = int(tokens.pop(0).value)  # Convierte el valor del token en un número entero
+                    if tokens[0].type == 'RPAREN':
+                        tokens.pop(0)  # Consume ')'  # Corrige el token esperado
+                        body = parse_single_statement(tokens)
+                        return ForNode(variable.value, initial_value, final_value, step, body)
+                    else:
+                        raise SyntaxError("Error de sintaxis: Se esperaba ')' al final del bucle FOR.")
+                else:
+                    raise SyntaxError("Error de sintaxis: Se esperaba 'TO' en la definición del bucle FOR.")
+            else:
+                raise SyntaxError("Error de sintaxis: Se esperaba '=' en la definición del bucle FOR.")
+        else:
+            raise SyntaxError("Error de sintaxis: Se esperaba un nombre de variable en la definición del bucle FOR.")
+    else:
+        raise SyntaxError("Error de sintaxis: Se esperaba '(' en la definición del bucle FOR.")
+
+    
 def parse_if_statement(tokens):
     tokens.pop(0)  # Consume 'IF'
     condition = expression(tokens)
@@ -155,7 +98,102 @@ def parse_else_statement(tokens):
     else_statement = parse_single_statement(tokens)
     return Node('ELSE', [else_statement])
 
-# Función para imprimir el árbol de forma recursiva
+
+# Función para el símbolo no terminal "expresión"
+def expression(tokens):
+    left = equality(tokens)
+    return left
+
+# Función para el símbolo no terminal "igualdad"
+def equality(tokens):
+    left = comparison(tokens)
+    while tokens and tokens[0].type in ('EQUALS', 'NOTEQUAL'):
+        op = tokens.pop(0)
+        right = comparison(tokens)
+        left = Node(op.type, [left, right])
+    return left
+
+# Función para el símbolo no terminal "comparación"
+def comparison(tokens):
+    left = addition(tokens)
+    while tokens and tokens[0].type in ('LESSTHAN', 'GREATERTHAN', 'LESSEQUAL', 'GREATEQUAL'):
+        op = tokens.pop(0)
+        right = addition(tokens)
+        left = Node(op.type, [left, right])
+    return left
+
+# Función para el símbolo no terminal "suma"
+def addition(tokens):
+    left = multiplication(tokens)
+    while tokens and tokens[0].type in ('PLUS', 'MINUS'):
+        op = tokens.pop(0)
+        right = multiplication(tokens)
+        left = Node(op.type, [left, right])
+    return left
+
+# Función para el símbolo no terminal "término"
+def multiplication(tokens):
+    left = factor(tokens)
+    while tokens and tokens[0].type in ('TIMES', 'DIVIDE'):
+        op = tokens.pop(0)
+        right = factor(tokens)
+        left = Node(op.type, [left, right])
+    return left
+
+# Función para el símbolo no terminal "factor"
+def factor(tokens):
+    if tokens[0].type == 'NUMBER':
+        return Node('NUMBER', value=int(tokens.pop(0).value))
+    elif tokens[0].type == 'LPAREN':
+        tokens.pop(0)  # Consume el paréntesis izquierdo
+        expr = expression(tokens)
+        if tokens[0].type == 'RPAREN':
+            tokens.pop(0)  # Consume el paréntesis derecho
+        return expr
+    elif tokens[0].type == 'DRACARYS':
+        return parse_dracarys(tokens)
+    elif tokens[0].type == 'STRING':
+        return Node('STRING', value=tokens.pop(0).value)
+    elif tokens[0].type == 'VARIABLE':
+        return Node('VARIABLE', value=tokens.pop(0).value)
+    raise SyntaxError(f"Error de sintaxis: Token inesperado '{tokens[0].type}' en factor.")
+
+
+
+
+def parse_dracarys(tokens):
+    tokens.pop(0)  # Consume 'DRACARYS'
+    if tokens[0].type == 'LPAREN':
+        tokens.pop(0)  # Consume '('
+        expression_node = expression(tokens)
+        if tokens[0].type == 'RPAREN':
+            tokens.pop(0)  # Consume ')'
+            return Node('DRACARYS', children=[expression_node])
+        else:
+            raise SyntaxError("Error de sintaxis: Se esperaba ')' después de la expresión.")
+    elif tokens[0].type == 'STRING':
+        string_node = tokens.pop(0).value
+        return Node('DRACARYS', value=string_node)
+    else:
+        raise SyntaxError("Error de sintaxis: Se esperaba '(' o una cadena después de 'DRACARYS'.")
+
+
+# Función para el símbolo no terminal "bloque"
+def parse_block(tokens):
+    tokens.pop(0)  # Consume '{'
+    statements = []
+
+    while tokens and tokens[0].type != 'RBRACE':
+        statement = parse_single_statement(tokens)
+        statements.append(statement)
+
+    if tokens and tokens[0].type == 'RBRACE':
+        tokens.pop(0)  # Consume '}'
+    else:
+        raise SyntaxError("Error de sintaxis: Falta '}' al final del bloque.")
+
+    return statements
+
 def print_ast(node, level=0):
     if isinstance(node, list):
         for item in node:
@@ -163,13 +201,29 @@ def print_ast(node, level=0):
     else:
         if node is None:
             return
-        print("  " * level + node.type + (f" ({node.value})" if node.value else ""))
-        for child in node.children:
-            print_ast(child, level + 1)
+        if isinstance(node, ForNode):
+            print("  " * level + node.type)
+            print("  " * (level + 1) + f"Variable: {node.variable}")
+            print("  " * (level + 1) + f"Initial Value: {node.initial_value.value}")
+            print("  " * (level + 1) + f"Final Value: {node.final_value.value}")
+            print("  " * (level + 1) + f"Step: {node.step}")
+            print("  " * (level + 1) + "Body:")
+            if isinstance(node.body, list):
+                for child in node.body:
+                    print_ast(child, level + 2)  # Imprime los elementos del cuerpo del bucle FOR
+            else:
+                print_ast(node.body, level + 2)  # Imprime el cuerpo del bucle FOR
+        else:
+            print("  " * level + node.type + (f" ({node.value})" if node.value else ""))
+        if hasattr(node, 'children'):
+            for child in node.children:
+                print_ast(child, level + 1)
 
 
-# Ejemplo de entrada
-entrada_ejemplo = "if (2!=3) {dracarys('Verdad')} else {dracarys('Falso')} endif"
+
+
+# Ejemplo de entrada con un bucle FOR
+entrada_ejemplo = "if(3==3){dracarys(3+4)}else{dracarys(4+5)}endif"
 
 # Llama al lexer con el ejemplo de entrada
 tokens_ejemplo = lexer(entrada_ejemplo)

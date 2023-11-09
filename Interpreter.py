@@ -92,7 +92,7 @@ def evaluate_single(node):
             return string_content[1:-1]
         else:
             return string_content
-    if node.type == "IF":
+    if node.type == "NORTE":
         condition = evaluate_single(node.children[0])
         if condition:
             return evaluate_single(node.children[1])

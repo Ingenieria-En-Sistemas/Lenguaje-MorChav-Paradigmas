@@ -30,7 +30,7 @@ def parse_program(tokens):
             # Si el token actual es un bucle FOR, procesarlo como tal
             for_statement = parse_for_statement(tokens)
             statements.append(for_statement)
-        elif tokens[0].type == "IF":
+        elif tokens[0].type == "NORTE":
             # Si el token actual es una expresión condicional (if), procesarlo como tal
             if_statement = parse_if_statement(tokens)
             statements.append(if_statement)
@@ -43,7 +43,7 @@ def parse_program(tokens):
 
 # Función para el símbolo no terminal "sentencia"
 def parse_single_statement(tokens):
-    if tokens[0].type == "IF":
+    if tokens[0].type == "NORTE":
         return parse_if_statement(tokens)
     elif tokens[0].type == "ELSE":
         return parse_else_statement(tokens)
@@ -169,7 +169,7 @@ def parse_for_statement(tokens):
 
 
 def parse_if_statement(tokens):
-    tokens.pop(0)  # Consume 'IF'
+    tokens.pop(0)  # Consume 'NORTE'
     condition = expression(tokens)
     if_statement = parse_single_statement(tokens)
     else_statement = None  # Inicialmente, no hay un 'ELSE' statement
@@ -182,7 +182,7 @@ def parse_if_statement(tokens):
     # Busca 'ENDIF' sin importar los espacios en blanco
     if tokens and tokens[0].type == "ENDIF":
         tokens.pop(0)  # Consume 'ENDIF'
-        return Node("IF", [condition, if_statement, else_statement])
+        return Node("NORTE", [condition, if_statement, else_statement])
 
     raise SyntaxError(
         "Error de sintaxis: Se esperaba 'ENDIF' al final de la declaración condicional."
@@ -254,7 +254,7 @@ def factor(tokens):
         return Node("NUMBER", value=int(tokens.pop(0).value))
     elif tokens[0].type == "LPAREN":
         tokens.pop(0)  # Consume el paréntesis izquierdo
-        if tokens[0].type == "IF":
+        if tokens[0].type == "NORTE":
             # Manejar una expresión condicional (if)
             condition = expression(tokens)
             if tokens[0].type == "RPAREN":
@@ -265,9 +265,9 @@ def factor(tokens):
                     tokens.pop(0)  # Consume 'ELSE'
                     else_expression = factor(tokens)
                     return Node(
-                        "IF", children=[condition, then_expression, else_expression]
+                        "NORTE", children=[condition, then_expression, else_expression]
                     )
-                return Node("IF", children=[condition, then_expression])
+                return Node("NORTE", children=[condition, then_expression])
             else:
                 raise SyntaxError(
                     "Error de sintaxis: Se esperaba ')' después de la condición en la expresión condicional."

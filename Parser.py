@@ -59,15 +59,15 @@ def parse_single_statement(tokens):
 
 
 def parse_variable_declaration(tokens):
-    var_type = tokens.pop(0).value  # Tipo de variable (int, string, etc.)
+    var_type = tokens.pop(0).value  # Tipo de variable (espada, string, etc.)
     variable_name = tokens.pop(0).value  # Nombre de la variable
     if tokens[0].type == "ASSIGN":
         tokens.pop(0)  # Consume '='
-        if var_type == 'int':
+        if var_type == 'espada':
             if tokens[0].type == "NUMBER":
                 value = expression(tokens)
             else:
-                raise SyntaxError("Error de sintaxis: Se esperaba un número entero como valor para 'int'.")
+                raise SyntaxError("Error de sintaxis: Se esperaba un número entero como valor para 'espada'.")
         elif var_type == 'string':
             if tokens[0].type == "STRING":
                 value = expression(tokens)
@@ -342,7 +342,7 @@ def print_ast(node, level=0):
 
 
 # Ejemplo de entrada con un bucle FOR
-entrada_ejemplo = """for (int i = 1 to 10 step 3) dracarys(2 + i)
+entrada_ejemplo = """for (espada i = 1 to 10 step 3) dracarys(2 + i)
 """
 
 # Llama al lexer con el ejemplo de entrada

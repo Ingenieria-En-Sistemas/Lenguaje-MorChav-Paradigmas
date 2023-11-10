@@ -118,7 +118,7 @@ def evaluate_single(node):
 
 # Código de prueba
 program = """
-for (int i = 1 to 10 step 2) dracarys(2 + i)
+for (espada i = 1 to 10 step 2) dracarys(2 + i)
 """
 tokens = lexer(program)
 ast = parse_program(tokens)

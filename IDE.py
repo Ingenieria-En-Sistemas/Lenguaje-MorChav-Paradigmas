@@ -2,9 +2,12 @@ import customtkinter
 from Lexer import lexer
 from Parser import parse_program
 from Interpreter import evaluate
-from customtkinter import CTkImage  # Importar CTkImage desde customtkinter
+from customtkinter import CTkImage
 from PIL import Image
 import random
+import tkinter as tk
+from tkinter import ttk
+from tkinter import messagebox
 
 customtkinter.set_appearance_mode("System")
 customtkinter.set_default_color_theme("dark-blue")
@@ -12,14 +15,10 @@ customtkinter.set_default_color_theme("dark-blue")
 def execute_expression():
     input_expr = input_text.get("1.0", "end-1c")
     try:
-        # Lexer
         tokens = lexer(input_expr)
-
-        # Parser
         ast = parse_program(tokens)
 
         if ast:
-            # Intérprete
             result = evaluate(ast)
             if result is not None:
                 output_text.configure(state="normal")
@@ -62,6 +61,29 @@ def change_window_title():
     new_title = random.choice(random_titles)
     app.title(new_title)
 
+def exit_action():
+    if messagebox.askokcancel("Salir", "¿Estás seguro de que quieres salir?"):
+        app.destroy()
+
+def options_action():
+    def save_options():
+        selected_option = v.get()
+        print(f"Opción seleccionada: {selected_option}")
+        options_window.destroy()
+
+    options_window = tk.Toplevel(app)
+    options_window.title("Opciones")
+
+    v = tk.StringVar(options_window)
+    v.set("Opción 1")
+
+    options_menu = ttk.Combobox(options_window, textvariable=v)
+    options_menu['values'] = ("Opción 1", "Opción 2", "Opción 3")
+    options_menu.pack(padx=10, pady=10)
+
+    save_button = tk.Button(options_window, text="Guardar", command=save_options)
+    save_button.pack(padx=10, pady=10)
+
 # Configurar la ventana principal
 app = customtkinter.CTk()
 app.geometry("1000x625")
@@ -72,26 +94,44 @@ button_container = customtkinter.CTkFrame(app)
 button_container.pack()
 
 # Cargar las imágenes como CTkImage y ajustar el tamaño
-run_image = Image.open("run.png")  # Reemplaza con la ubicación de tu icono "Ejecutar"
-run_icon = CTkImage(light_image=run_image, size=(50, 50))  # Ajusta el tamaño a 32x32 píxeles
+run_image = Image.open("run.png")
+run_icon = CTkImage(light_image=run_image, size=(45, 45))
 
-clear_image = Image.open("clear.png")  # Reemplaza con la ubicación de tu icono "Limpiar"
-clear_icon = CTkImage(light_image=clear_image, size=(50, 50))  # Ajusta el tamaño a 32x32 píxeles
+exit_image = Image.open("exit.png")
+exit_icon = CTkImage(light_image=exit_image, size=(45, 45))
+
+new_image = Image.open("new.png")
+new_icon = CTkImage(light_image=new_image, size=(45, 45))
+
+clear_image = Image.open("clear.png")
+clear_icon = CTkImage(light_image=clear_image, size=(45, 45))
+
 
 # Crear un campo de entrada de texto desplazable más grande
 input_text = customtkinter.CTkTextbox(app, wrap=customtkinter.WORD, width=500, height=350)
 input_text.configure(font=("Consolas", 17))
 input_text.pack(padx=10, pady=(10, 5), fill="both")
 
-# Crea el botón para ejecutar la expresión con el icono
-execute_button = customtkinter.CTkButton(button_container, text="Run", image=run_icon, compound="left", command=execute_expression)
+optionmenu_1 = customtkinter.CTkOptionMenu(button_container, height=55,width=160, values=["Estructuras de Lenguaje", "Palabras Reservadas", "Sintaxis", "Semántica", "Tipos de Datos"])
+optionmenu_1.configure(font=("Consolas", 17))
+optionmenu_1.pack(side="left", padx=10)
+optionmenu_1.set("Opciones")
+
+# Crear botones adicionales "Nuevo", "Opciones" y "Salir"
+new_button = customtkinter.CTkButton(button_container, text="Nuevo", image=new_icon, compound="left", command=clear_input, fg_color="white",text_color="black")
+new_button.configure(font=("Consolas", 17))
+new_button.pack(side="left", padx=10)
+
+# Crear el botón para ejecutar la expresión con el icono
+execute_button = customtkinter.CTkButton(button_container, text="Ejecutar", image=run_icon, compound="left", command=execute_expression, fg_color="green",text_color="black")
 execute_button.configure(font=("Consolas", 17))
 execute_button.pack(side="left", padx=10)
 
-# Crea el botón para limpiar el campo de entrada y el campo de salida con el icono
-clear_button = customtkinter.CTkButton(button_container, text="Clean", image=clear_icon, compound="left", command=clear_input)
-clear_button.configure(font=("Consolas", 17))
-clear_button.pack(side="left", padx=10)
+
+
+exit_button = customtkinter.CTkButton(button_container, text="Salir",image=exit_icon, compound="left", command=exit_action, fg_color="#ec5353", text_color="black")
+exit_button.configure(font=("Consolas", 17))
+exit_button.pack(side="left", padx=10)
 
 # Crear un campo de salida de texto desplazable más grande
 output_text = customtkinter.CTkTextbox(app, state="disabled", wrap=customtkinter.WORD, width=60, height=200)

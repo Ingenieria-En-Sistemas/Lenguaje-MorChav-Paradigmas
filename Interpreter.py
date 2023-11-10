@@ -83,7 +83,7 @@ def evaluate_single(node):
             return dracarys_content
         elif node.value:  # Manejar el caso donde DRACARYS es una variable
             return evaluate_single(node.value)
-    if node.type == "STRING":
+    if node.type == "LOBOS":
         string_content = node.value
         if string_content and (
             string_content[0] == string_content[-1]
@@ -118,7 +118,8 @@ def evaluate_single(node):
 
 # Código de prueba
 program = """
-for (espada i = 1 to 10 step 2) dracarys(2 + i)
+lobos a ='hola'
+
 """
 tokens = lexer(program)
 ast = parse_program(tokens)

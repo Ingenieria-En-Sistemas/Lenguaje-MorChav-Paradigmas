@@ -68,11 +68,11 @@ def parse_variable_declaration(tokens):
                 value = expression(tokens)
             else:
                 raise SyntaxError("Error de sintaxis: Se esperaba un número entero como valor para 'espada'.")
-        elif var_type == 'string':
+        elif var_type == 'lobos':
             if tokens[0].type == "STRING":
                 value = expression(tokens)
             else:
-                raise SyntaxError("Error de sintaxis: Se esperaba una cadena entre comillas como valor para 'string'.")
+                raise SyntaxError("Error de sintaxis: Se esperaba una cadena entre comillas como valor para 'LOBOS'.")
         elif var_type == 'bool':
             # Agrega la lógica para bool aquí si es necesario
             pass
@@ -280,7 +280,7 @@ def factor(tokens):
     elif tokens[0].type == "DRACARYS":
         return parse_dracarys(tokens)
     elif tokens[0].type == "STRING":
-        return Node("STRING", value=tokens.pop(0).value)
+        return Node("LOBOS", value=tokens.pop(0).value)
     elif tokens[0].type == "VARIABLE":
         return Node("VARIABLE", value=tokens.pop(0).value)
     raise SyntaxError(
@@ -342,8 +342,7 @@ def print_ast(node, level=0):
 
 
 # Ejemplo de entrada con un bucle FOR
-entrada_ejemplo = """for (espada i = 1 to 10 step 3) dracarys(2 + i)
-"""
+entrada_ejemplo = """ lobos a='hola' """
 
 # Llama al lexer con el ejemplo de entrada
 tokens_ejemplo = lexer(entrada_ejemplo)

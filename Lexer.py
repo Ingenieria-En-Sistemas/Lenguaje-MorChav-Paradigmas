@@ -23,7 +23,7 @@ tokens = [
     ('STEP', r'step'),
     ('STEP', r'STEP'),
     ('TO', r'to'),
-    ('TYPE', r'espada|float|string|bool'),
+    ('TYPE', r'espada|float|lobos|bool'),
     ('VARIABLE', r'[a-zA-Z_][a-zA-Z0-9_]*'),  
     ('EQUALS', r'=='),
     ('ASSIGN', r'='),

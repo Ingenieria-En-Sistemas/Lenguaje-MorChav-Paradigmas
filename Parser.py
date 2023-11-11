@@ -45,7 +45,7 @@ def parse_program(tokens):
 def parse_single_statement(tokens):
     if tokens[0].type == "NORTE":
         return parse_if_statement(tokens)
-    elif tokens[0].type == "ELSE":
+    elif tokens[0].type == "SUR":
         return parse_else_statement(tokens)
     elif tokens[0].type == "DRACARYS":
         return parse_dracarys(tokens)
@@ -175,7 +175,7 @@ def parse_if_statement(tokens):
     else_statement = None  # Inicialmente, no hay un 'ELSE' statement
 
     # Comprueba si hay 'ELSE'
-    if tokens and tokens[0].type == "ELSE":
+    if tokens and tokens[0].type == "SUR":
         tokens.pop(0)  # Consume 'ELSE'
         else_statement = parse_single_statement(tokens)
 
@@ -192,7 +192,7 @@ def parse_if_statement(tokens):
 def parse_else_statement(tokens):
     tokens.pop(0)  # Consume 'ELSE'
     else_statement = parse_single_statement(tokens)
-    return Node("ELSE", [else_statement])
+    return Node("SUR", [else_statement])
 
 
 # Función para el símbolo no terminal "expresión"
@@ -259,10 +259,10 @@ def factor(tokens):
             condition = expression(tokens)
             if tokens[0].type == "RPAREN":
                 tokens.pop(0)  # Consume el paréntesis derecho
-                # Manejar las ramas "THEN" y "ELSE" si fuera necesario
+                # Manejar las ramas "THEN" y "SUR" si fuera necesario
                 then_expression = factor(tokens)
-                if tokens[0].type == "ELSE":
-                    tokens.pop(0)  # Consume 'ELSE'
+                if tokens[0].type == "SUR":
+                    tokens.pop(0)  # Consume 'SUR'
                     else_expression = factor(tokens)
                     return Node(
                         "NORTE", children=[condition, then_expression, else_expression]

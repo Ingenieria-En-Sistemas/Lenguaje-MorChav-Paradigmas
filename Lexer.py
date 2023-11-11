@@ -4,7 +4,7 @@ import re
 tokens = [
     ('NUMBER', r'\d+'),
     ('PLUS', r'\+'),
-    ('ENDIF', r'(?i)endif'),
+    ('ENDNORTE', r'(?i)endnorte'),
     ('MINUS', r'-'),
     ('TIMES', r'\*'),
     ('DIVIDE', r'/'),

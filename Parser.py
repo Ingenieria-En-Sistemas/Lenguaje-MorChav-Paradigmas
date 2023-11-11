@@ -180,12 +180,12 @@ def parse_if_statement(tokens):
         else_statement = parse_single_statement(tokens)
 
     # Busca 'ENDIF' sin importar los espacios en blanco
-    if tokens and tokens[0].type == "ENDIF":
+    if tokens and tokens[0].type == "ENDNORTE":
         tokens.pop(0)  # Consume 'ENDIF'
         return Node("NORTE", [condition, if_statement, else_statement])
 
     raise SyntaxError(
-        "Error de sintaxis: Se esperaba 'ENDIF' al final de la declaración condicional."
+        "Error de sintaxis: Se esperaba 'ENDNORTE' al final de la declaración condicional."
     )
 
 

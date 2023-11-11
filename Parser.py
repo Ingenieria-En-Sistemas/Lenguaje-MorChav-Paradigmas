@@ -26,8 +26,8 @@ def parse_program(tokens):
             # Si el token actual es una declaración de variable, procesarla como tal
             variable_declaration = parse_variable_declaration(tokens)
             statements.append(variable_declaration)
-        elif tokens[0].type == "FOR":
-            # Si el token actual es un bucle FOR, procesarlo como tal
+        elif tokens[0].type == "VIAJE":
+            # Si el token actual es un bucle VIAJE, procesarlo como tal
             for_statement = parse_for_statement(tokens)
             statements.append(for_statement)
         elif tokens[0].type == "NORTE":
@@ -51,7 +51,7 @@ def parse_single_statement(tokens):
         return parse_dracarys(tokens)
     elif tokens[0].type == "LBRACE":
         return parse_block(tokens)
-    elif tokens[0].type == "FOR":
+    elif tokens[0].type == "VIAJE":
         return parse_for_statement(tokens)
     elif tokens[0].type == "TYPE":  # Identifica las declaraciones de variables
         return parse_variable_declaration(tokens)
@@ -109,7 +109,7 @@ def parse_variable_reference(tokens):
 # ...
 
 def parse_for_statement(tokens):
-    tokens.pop(0)  # Consume 'FOR'
+    tokens.pop(0)  # Consume 'VIAJE'
     if tokens[0].type == "LPAREN":
         tokens.pop(0)  # Consume '('
         if tokens[0].type == "TYPE":
@@ -122,7 +122,7 @@ def parse_for_statement(tokens):
                 if tokens[0].type == "NUMBER":
                     initial_value = expression(tokens)  
                 else:
-                    raise SyntaxError("Error de sintaxis: Se esperaba un número como valor inicial en la definición del bucle FOR.")
+                    raise SyntaxError("Error de sintaxis: Se esperaba un número como valor inicial en la definición del bucle VIAJE.")
 
                 if tokens[0].type == "TO":
                     tokens.pop(0)  # Consume 'TO'
@@ -139,9 +139,9 @@ def parse_for_statement(tokens):
                         if initial_value:
                             variables[variable] = initial_value.value  # Almacenar el valor numérico
 
-                        # Crear un nodo 'FOR' utilizando la clase 'Node'
+                        # Crear un nodo 'VIAJE' utilizando la clase 'Node'
                         return Node(
-                            "FOR",
+                            "VIAJE",
                             children=[
                                 Node("VARIABLE_DECLARATION", children=[
                                     Node("TYPE", value=var_type),
@@ -154,15 +154,15 @@ def parse_for_statement(tokens):
                             ]
                         )
                     else:
-                        raise SyntaxError("Error de sintaxis: Se esperaba ')' al final del bucle FOR.")
+                        raise SyntaxError("Error de sintaxis: Se esperaba ')' al final del bucle VIAJE.")
                 else:
-                    raise SyntaxError("Error de sintaxis: Se esperaba 'TO' en la definición del bucle FOR.")
+                    raise SyntaxError("Error de sintaxis: Se esperaba 'TO' en la definición del bucle VIAJE.")
             else:
-                raise SyntaxError("Error de sintaxis: Se esperaba '=' en la definición del bucle FOR.")
+                raise SyntaxError("Error de sintaxis: Se esperaba '=' en la definición del bucle VIAJE.")
         else:
-            raise SyntaxError("Error de sintaxis: Se esperaba el tipo de variable en la definición del bucle FOR.")
+            raise SyntaxError("Error de sintaxis: Se esperaba el tipo de variable en la definición del bucle VIAJE.")
     else:
-        raise SyntaxError("Error de sintaxis: Se esperaba '(' en la definición del bucle FOR.")
+        raise SyntaxError("Error de sintaxis: Se esperaba '(' en la definición del bucle VIAJE.")
 
 
 
@@ -342,7 +342,7 @@ def print_ast(node, level=0):
 
 
 # Ejemplo de entrada con un bucle FOR
-entrada_ejemplo = """ lobos a='hola' """
+entrada_ejemplo = """ VIAJE(espada i = 1 to 10 step 2) dracarys(2 + i) """
 
 # Llama al lexer con el ejemplo de entrada
 tokens_ejemplo = lexer(entrada_ejemplo)

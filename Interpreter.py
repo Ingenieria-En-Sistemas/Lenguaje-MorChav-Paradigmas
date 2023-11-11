@@ -59,7 +59,7 @@ def evaluate_single(node):
         left = evaluate_single(node.children[0])
         right = evaluate_single(node.children[1])
         return left == right
-    if node.type == "FOR":
+    if node.type == "VIAJE":
         variable_name = node.children[0].children[1].value
         initial_value = node.children[0].children[2].value  # El valor inicial es un nodo
         final_value = node.children[1].value

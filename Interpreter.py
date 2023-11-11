@@ -59,7 +59,7 @@ def evaluate_single(node):
         left = evaluate_single(node.children[0])
         right = evaluate_single(node.children[1])
         return left == right
-    if node.type == "FOR":
+    if node.type == "VIAJE":
         variable_name = node.children[0].children[1].value
         initial_value = node.children[0].children[2].value  # El valor inicial es un nodo
         final_value = node.children[1].value
@@ -83,7 +83,7 @@ def evaluate_single(node):
             return dracarys_content
         elif node.value:  # Manejar el caso donde DRACARYS es una variable
             return evaluate_single(node.value)
-    if node.type == "STRING":
+    if node.type == "LOBOS":
         string_content = node.value
         if string_content and (
             string_content[0] == string_content[-1]
@@ -92,7 +92,7 @@ def evaluate_single(node):
             return string_content[1:-1]
         else:
             return string_content
-    if node.type == "IF":
+    if node.type == "NORTE":
         condition = evaluate_single(node.children[0])
         if condition:
             return evaluate_single(node.children[1])
@@ -118,7 +118,8 @@ def evaluate_single(node):
 
 # Código de prueba
 program = """
-for (int i = 1 to 10 step 2) dracarys(2 + i)
+lobos a ='hola'
+
 """
 tokens = lexer(program)
 ast = parse_program(tokens)

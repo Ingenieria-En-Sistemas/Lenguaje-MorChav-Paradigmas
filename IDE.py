@@ -12,6 +12,8 @@ from tkinter import messagebox
 customtkinter.set_appearance_mode("System")
 customtkinter.set_default_color_theme("dark-blue")
 
+textIf="NORTE(2!=2){\n\tdracarys('Verdadero')\n}SUR{\n\tdracarys('Falso')\n}ENDNORTE"
+textFor="VIAJE(espada i = 1 to 10 step 2)\n\tdracarys(i*2)"
 def execute_expression():
     input_expr = input_text.get("1.0", "end-1c")
     try:
@@ -64,25 +66,20 @@ def change_window_title():
 def exit_action():
     if messagebox.askokcancel("Salir", "¿Estás seguro de que quieres salir?"):
         app.destroy()
+def add_selected_option_to_input_text():
+    selected_option = combobox.get()
+    clear_input()
+    if selected_option=="IF":
+        input_text.insert("end", textIf)
+    if selected_option=="FOR":
+        input_text.insert("end", textFor)
+    if selected_option=="hola mundo":
+        input_text.insert("end", f"dracarys('Hola mundo')")
+    if selected_option=="op 4":
+        input_text.insert("end", f"text")
+    if selected_option=="5":
+        input_text.insert("end", f"text")
 
-def options_action():
-    def save_options():
-        selected_option = v.get()
-        print(f"Opción seleccionada: {selected_option}")
-        options_window.destroy()
-
-    options_window = tk.Toplevel(app)
-    options_window.title("Opciones")
-
-    v = tk.StringVar(options_window)
-    v.set("Opción 1")
-
-    options_menu = ttk.Combobox(options_window, textvariable=v)
-    options_menu['values'] = ("Opción 1", "Opción 2", "Opción 3")
-    options_menu.pack(padx=10, pady=10)
-
-    save_button = tk.Button(options_window, text="Guardar", command=save_options)
-    save_button.pack(padx=10, pady=10)
 
 # Configurar la ventana principal
 app = customtkinter.CTk()
@@ -112,10 +109,14 @@ input_text = customtkinter.CTkTextbox(app, wrap=customtkinter.WORD, width=500, h
 input_text.configure(font=("Consolas", 17))
 input_text.pack(padx=10, pady=(10, 5), fill="both")
 
-optionmenu_1 = customtkinter.CTkOptionMenu(button_container, height=55,width=160, values=["Estructuras de Lenguaje", "Palabras Reservadas", "Sintaxis", "Semántica", "Tipos de Datos"])
-optionmenu_1.configure(font=("Consolas", 17))
-optionmenu_1.pack(side="left", padx=10)
-optionmenu_1.set("Opciones")
+options = ["IF", "FOR", "hola mundo", "op 4", "5"]
+combobox = customtkinter.CTkComboBox(button_container,height=55,width=160, values=options)
+combobox.pack(side="left", padx=10)
+combobox.set("Opciones")
+
+
+add_selected_option_button = customtkinter.CTkButton(button_container,height=55,width=160, text="Agregar opción seleccionada", command=add_selected_option_to_input_text)
+add_selected_option_button.pack(side="left", padx=10)
 
 # Crear botones adicionales "Nuevo", "Opciones" y "Salir"
 new_button = customtkinter.CTkButton(button_container, text="Nuevo", image=new_icon, compound="left", command=clear_input, fg_color="white",text_color="black")

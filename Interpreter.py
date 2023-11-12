@@ -59,6 +59,19 @@ def evaluate_single(node):
         left = evaluate_single(node.children[0])
         right = evaluate_single(node.children[1])
         return left == right
+    if node.type == "WHILE":
+        condition = node.children[0]
+        body = node.children[1]
+
+        # Lista para almacenar los resultados de las iteraciones
+        results = []
+
+        while evaluate_single(condition):
+            result = evaluate_single(body)
+            results.append(result)
+
+        return results  # Devolver la lista de resultados de las iteraciones
+
     if node.type == "VIAJE":
         variable_name = node.children[0].children[1].value
         initial_value = node.children[0].children[2].value  # El valor inicial es un nodo
@@ -118,8 +131,11 @@ def evaluate_single(node):
 
 # Código de prueba
 program = """
-lobos a ='hola'
-
+espada i = 3
+while (true) {
+  dracarys(i * 2)
+  
+}
 """
 tokens = lexer(program)
 ast = parse_program(tokens)

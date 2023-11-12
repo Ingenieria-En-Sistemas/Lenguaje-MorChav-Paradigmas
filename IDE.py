@@ -103,3 +103,11 @@ change_window_title()
 
 # Ejecutar la aplicación
 app.mainloop()
+
+"""
+norte(2==2){
+	dracarys("hola")
+}SUR{
+	dracarys("falta")
+}endnorte 
+"""

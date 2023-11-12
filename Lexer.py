@@ -33,8 +33,11 @@ tokens = [
     ('LESSTHAN', r'<'),
     ('GREATERTHAN', r'>'),
     ('LESSEQUAL', r'<='),
-    ('GREATEQUAL', r'>=')
-   
+    ('GREATEQUAL', r'>='),
+    ('WHILE', r'while'),
+    ('TRUE', r'true'),
+    ('FALSE', r'false'),
+    ("ENDWHILE", "endwhile")
     
 ]
 

@@ -30,6 +30,10 @@ def parse_program(tokens):
             # Si el token actual es un bucle VIAJE, procesarlo como tal
             for_statement = parse_for_statement(tokens)
             statements.append(for_statement)
+        elif tokens[0].type == "WHILE":
+            # Si el token actual es un bucle WHILE, procesarlo como tal
+            while_statement = parse_while_statement(tokens)
+            statements.append(while_statement)
         elif tokens[0].type == "NORTE":
             # Si el token actual es una expresión condicional (if), procesarlo como tal
             if_statement = parse_if_statement(tokens)
@@ -53,11 +57,53 @@ def parse_single_statement(tokens):
         return parse_block(tokens)
     elif tokens[0].type == "VIAJE":
         return parse_for_statement(tokens)
+    if tokens[0].type == "WHILE":
+        return parse_while_statement(tokens)
     elif tokens[0].type == "TYPE":  # Identifica las declaraciones de variables
         return parse_variable_declaration(tokens)
     return expression(tokens)
 
 
+def parse_while_statement(tokens):
+    tokens.pop(0)  # Consume 'WHILE'
+    condition = expression(tokens)
+
+    # Verifica si hay una apertura de llave '{'
+    if tokens[0].type == "LBRACE":
+        tokens.pop(0)  # Consume '{'
+
+        # Obtiene el cuerpo del bucle
+        body = parse_program(tokens)
+
+        # Verifica si hay un cierre de llave '}'
+        if tokens[0].type == "RBRACE":
+            tokens.pop(0)  # Consume '}'
+
+            # Añade la lógica para incrementar la variable i
+            increment_i = Node("ASSIGN", [
+                Node("VARIABLE", value="i"),
+                Node("PLUS", [
+                    Node("VARIABLE", value="i"),
+                    Node("NUMBER", value=1)
+                ])
+            ])
+
+            # Verifica si hay 'ENDWHILE'
+            if tokens and tokens[0].type == "ENDWHILE":
+                tokens.pop(0)  # Consume 'ENDWHILE'
+                return Node("WHILE", [condition, [body, increment_i]])
+            else:
+                raise SyntaxError("Error de sintaxis: Se esperaba 'ENDWHILE' al final del bucle WHILE.")
+        else:
+            raise SyntaxError("Error de sintaxis: Se esperaba '}' después del cuerpo del bucle WHILE.")
+    else:
+        raise SyntaxError("Error de sintaxis: Se esperaba '{' al comienzo del cuerpo del bucle WHILE.")
+
+
+def parse_boolean(tokens):
+    if tokens[0].type == "TRUE" or tokens[0].type == "FALSE":
+        return Node("BOOLEAN", value=(tokens.pop(0).type == "TRUE"))
+    raise SyntaxError(f"Error de sintaxis: Token inesperado '{tokens[0].type}' en parse_boolean.")
 def parse_variable_declaration(tokens):
     var_type = tokens.pop(0).value  # Tipo de variable (espada, string, etc.)
     variable_name = tokens.pop(0).value  # Nombre de la variable
@@ -252,6 +298,8 @@ def multiplication(tokens):
 def factor(tokens):
     if tokens[0].type == "NUMBER":
         return Node("NUMBER", value=int(tokens.pop(0).value))
+    elif tokens[0].type == "TRUE" or tokens[0].type == "FALSE":
+        return parse_boolean(tokens)
     elif tokens[0].type == "LPAREN":
         tokens.pop(0)  # Consume el paréntesis izquierdo
         if tokens[0].type == "NORTE":
@@ -342,7 +390,14 @@ def print_ast(node, level=0):
 
 
 # Ejemplo de entrada con un bucle FOR
-entrada_ejemplo = """ VIAJE(espada i = 1 to 10 step 2) dracarys(2 + i) """
+entrada_ejemplo = """ 
+espada i = 1
+while(i<10){
+    DRACARYS("hola")
+   
+}
+endwhile
+ """
 
 # Llama al lexer con el ejemplo de entrada
 tokens_ejemplo = lexer(entrada_ejemplo)

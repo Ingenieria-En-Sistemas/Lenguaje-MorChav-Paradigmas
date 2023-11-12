@@ -47,6 +47,14 @@ def clear_input():
     output_text.configure(state="normal")
     output_text.delete("1.0", "end")
     output_text.configure(state="disabled")
+def add_selected_option_to_input_text():
+    selected_option = combobox.get()
+    if selected_option=="IF":
+        input_text.insert("end", f"\n")
+    if selected_option=="FOR":
+        input_text.insert("end", f"\n")
+    if selected_option=="hola mundo":
+        input_text.insert("end", f"dracarys('Hola mundo')")
 
 # Lista de títulos aleatorios
 random_titles = [
@@ -70,6 +78,13 @@ app.iconbitmap("drake.ico")
 # Crear un contenedor para los botones y centrarlos
 button_container = customtkinter.CTkFrame(app)
 button_container.pack()
+
+options = ["Estructuras de datos","IF", "FOR", "hola mundo", "4", "5"]
+combobox = customtkinter.CTkComboBox(button_container, values=options)
+combobox.pack(side="left", padx=10)
+add_selected_option_button = customtkinter.CTkButton(button_container, text="Agregar opción seleccionada", command=add_selected_option_to_input_text)
+add_selected_option_button.pack(side="left", padx=10)
+combobox.bind("<<ComboboxSelected>>", add_selected_option_to_input_text)
 
 # Cargar las imágenes como CTkImage y ajustar el tamaño
 run_image = Image.open("run.png")  # Reemplaza con la ubicación de tu icono "Ejecutar"

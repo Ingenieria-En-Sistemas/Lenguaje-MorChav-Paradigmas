@@ -20,11 +20,21 @@ def execute_expression():
 
         if ast:
             # Intérprete
-            result = evaluate(ast)
-            if result is not None:
+            results = evaluate(ast)
+            if results:
                 output_text.configure(state="normal")
                 output_text.delete("1.0", "end")
-                output_text.insert("1.0", f"{result}\n")
+
+                # Modificar la forma en que se manejan los resultados
+                for result in results:
+                    if isinstance(result, list):
+                        # Si es una lista, concaténala en una línea sin comas ni espacios
+                        result_line = "".join(map(str, result))
+                        output_text.insert("end", result_line + "\n")
+                    else:
+                        # Si no es una lista, imprímelo en una nueva línea
+                        output_text.insert("end", str(result) + "\n")
+
                 output_text.configure(state="disabled")
             else:
                 output_text.configure(state="normal")
@@ -42,19 +52,24 @@ def execute_expression():
         output_text.insert("1.0", f"Error: {e}\n")
         output_text.configure(state="disabled")
 
+
+
 def clear_input():
     input_text.delete("1.0", "end")
     output_text.configure(state="normal")
     output_text.delete("1.0", "end")
     output_text.configure(state="disabled")
+
 def add_selected_option_to_input_text():
     selected_option = combobox.get()
-    if selected_option=="IF":
-        input_text.insert("end", f"\n")
-    if selected_option=="FOR":
-        input_text.insert("end", f"\n")
-    if selected_option=="hola mundo":
+    if selected_option == "IF":
+        input_text.insert("end", "\nNORTE(2==2){\n\tDRACARYS('VERDAD')\n}SUR{\n\tDRACARYS('FALSO')\n}ENDNORTE")
+    elif selected_option == "FOR":
+        input_text.insert("end", f"VIAJE(espada i = 1 to 10 step 2) dracarys(i*2)")
+    elif selected_option == "PRINT":
         input_text.insert("end", f"dracarys('Hola mundo')")
+    elif selected_option == "WHILE":
+        input_text.insert("end", "\nMIENTRAS(2==2){\n\tDRACARYS('Bucle infinito')\n}ENDMIENTRAS")
 
 # Lista de títulos aleatorios
 random_titles = [
@@ -79,10 +94,11 @@ app.iconbitmap("drake.ico")
 button_container = customtkinter.CTkFrame(app)
 button_container.pack()
 
-options = ["Estructuras de datos","IF", "FOR", "hola mundo", "4", "5"]
+options = ["Estructuras de datos", "IF", "FOR", "WHILE", "PRINT", "-", "-"]
 combobox = customtkinter.CTkComboBox(button_container, values=options)
 combobox.pack(side="left", padx=10)
-add_selected_option_button = customtkinter.CTkButton(button_container, text="Agregar opción seleccionada", command=add_selected_option_to_input_text)
+add_selected_option_button = customtkinter.CTkButton(button_container, text="Agregar", command=add_selected_option_to_input_text)
+add_selected_option_button.configure(font=("Consolas", 17))
 add_selected_option_button.pack(side="left", padx=10)
 combobox.bind("<<ComboboxSelected>>", add_selected_option_to_input_text)
 
@@ -118,11 +134,3 @@ change_window_title()
 
 # Ejecutar la aplicación
 app.mainloop()
-
-"""
-norte(2==2){
-	dracarys("hola")
-}SUR{
-	dracarys("falta")
-}endnorte 
-"""

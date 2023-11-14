@@ -4,7 +4,8 @@ import re
 tokens = [
     ('NUMBER', r'\d+'),
     ('PLUS', r'\+'),
-    ('ENDNORTE', r'(?i)endnorte'),
+    ('ENDNORTE', r'endnorte'),
+    ('ENDNORTE', r'ENDNORTE'),
     ('MINUS', r'-'),
     ('TIMES', r'\*'),
     ('DIVIDE', r'/'),
@@ -15,8 +16,12 @@ tokens = [
     ('DRACARYS', r'dracarys'),
     ('DRACARYS', r'DRACARYS'),
     ('STRING', r'\'[^\']*\'|"[^"]*"'),
-    ('NORTE', r'norte'),
+    ('NORTE', r'Norte'),
     ('NORTE', r'NORTE'),
+    ('WHILE', r'while'),
+    ('TRUE', r'true'),
+    ('FALSE', r'false'),
+    ("ENDWHILE", "endwhile"),
     ('SUR', r'sur'),
     ('SUR', r'SUR'),
     ('VIAJE', r'VIAJE'),
@@ -33,11 +38,7 @@ tokens = [
     ('LESSTHAN', r'<'),
     ('GREATERTHAN', r'>'),
     ('LESSEQUAL', r'<='),
-    ('GREATEQUAL', r'>='),
-    ('WHILE', r'while'),
-    ('TRUE', r'true'),
-    ('FALSE', r'false'),
-    ("ENDWHILE", "endwhile")
+    ('GREATEQUAL', r'>=')
     
 ]
 

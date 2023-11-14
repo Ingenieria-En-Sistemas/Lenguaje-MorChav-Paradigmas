@@ -6,14 +6,13 @@ variables = {}
 
 
 def evaluate(nodes):
-    last_result = None  # Variable para almacenar el valor del último nodo visitado
-
+    results = []  # Almacena todos los resultados de la ejecución
     for node in nodes:
         result = evaluate_single(node)
         if result is not None:
-            last_result = result
+            results.extend(result)  # Extiende la lista de resultados
 
-    return last_result
+    return results
 
 
 def evaluate_single(node):
@@ -22,11 +21,11 @@ def evaluate_single(node):
         for child in node:
             result = evaluate_single(child)
             if result is not None:
-                results.append(result)
+                results.extend(result)  # Extiende la lista de resultados
         return results
 
     if node.type == "NUMBER":
-        return node.value
+        return node.value  # Devuelve directamente el valor numérico
     if node.type == "PLUS":
         left = evaluate_single(node.children[0])
         right = evaluate_single(node.children[1])
@@ -68,7 +67,7 @@ def evaluate_single(node):
 
         while evaluate_single(condition):
             result = evaluate_single(body)
-            results.append(result)
+            results.extend(result)
 
         return results  # Devolver la lista de resultados de las iteraciones
 
@@ -86,7 +85,7 @@ def evaluate_single(node):
             # Agregar la variable de control al diccionario de variables
             variables[variable_name] = i
             result = evaluate_single(body)
-            results.append(result)
+            results.append(result)  # Agrega el resultado de la iteración actual
 
         return results  # Devolver la lista de resultados de las iteraciones
 
@@ -102,9 +101,9 @@ def evaluate_single(node):
             string_content[0] == string_content[-1]
             and (string_content[0] == '"' or string_content[0] == "'")
         ):
-            return string_content[1:-1]
+            return [string_content[1:-1]]  # Devuelve el contenido de la cadena sin comillas como una lista
         else:
-            return string_content
+            return [string_content]
     if node.type == "NORTE":
         condition = evaluate_single(node.children[0])
         if condition:
@@ -121,21 +120,17 @@ def evaluate_single(node):
             variable_name = node.children[1].value
             variable_value = evaluate_single(node.children[3])
             variables[variable_name] = variable_value
-            return f"{variable_name} = {variable_value}"
+            return [f"{variable_name} = {variable_value}"]
     if node.type == "VARIABLE":
         variable_name = node.value
         if variable_name in variables:
             return variables[variable_name]
     return None
 
-
 # Código de prueba
 program = """
-espada i = 3
-while (true) {
-  dracarys(i * 2)
-  
-}
+VIAJE(espada i = 1 to 10 step 1) dracarys(i*2)
+dracarys('Hola mundo')
 """
 tokens = lexer(program)
 ast = parse_program(tokens)

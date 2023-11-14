@@ -114,13 +114,6 @@ app.iconbitmap("drake.ico")
 button_container = customtkinter.CTkFrame(app)
 button_container.pack()
 
-options = ["Estructuras de datos", "IF", "FOR", "WHILE", "PRINT", "-", "-"]
-combobox = customtkinter.CTkComboBox(button_container, values=options)
-combobox.pack(side="left", padx=10)
-add_selected_option_button = customtkinter.CTkButton(button_container, text="Agregar", command=add_selected_option_to_input_text)
-add_selected_option_button.configure(font=("Consolas", 17))
-add_selected_option_button.pack(side="left", padx=10)
-combobox.bind("<<ComboboxSelected>>", add_selected_option_to_input_text)
 
 # Cargar las imágenes como CTkImage y ajustar el tamaño
 run_image = Image.open("run.png")

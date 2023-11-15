@@ -13,7 +13,7 @@ tokens = [
     ('LBRACE', r'\{'),
     ('RBRACE', r'\}'),
     ('DRACARYS', r'(?i)dracarys'),
-    ('STRING', r'\'[^\']*\'|"[^"]*"'),
+    ('STRING', r'"[^"]*"'),
     ('NORTE', r'(?i)norte'),
     ('WHILE', r'(?i)while'),
     ('TRUE', r'true'),

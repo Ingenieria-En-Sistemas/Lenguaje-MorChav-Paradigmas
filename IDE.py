@@ -28,7 +28,7 @@ def execute_expression():
                 for result in results:
                     if isinstance(result, list):
                         # Si es una lista, concaténala en una línea sin comas ni espacios
-                        result_line = "".join(map(str, result))
+                        result_line = "\n".join(map(str, result))
                         output_text.insert("end", result_line + "\n")
                     else:
                         # Si no es una lista, imprímelo en una nueva línea
@@ -64,16 +64,16 @@ def add_selected_option_to_input_text():
     if selected_option == "IF":
         input_text.insert(
             "end",
-            "NORTE(2!=2){\n\tdracarys('Verdadero')\n}SUR{\n\tdracarys('Falso')\n}ENDNORTE",
+            """NORTE(2!=2){\n\tdracarys("Verdadero")\n}SUR{\n\tdracarys("Falso")\n}ENDNORTE""",
         )
     elif selected_option == "FOR":
         input_text.insert("end", f"VIAJE(espada i = 1 to 10 step 2) dracarys(i*2)")
     elif selected_option == "PRINT":
-        input_text.insert("end", f"dracarys('Hola mundo')")
+        input_text.insert("end", f"""dracarys("Hola mundo")""")
     elif selected_option == "WHILE":
         input_text.insert(
             "end",
-            "\nespada i = 1 while(i<10){\n\tDRACARYS('Menor que 10')\n i=i+1\n}endwhile",
+            """\nespada i = 1 while(i<10){\n\tDRACARYS("Menor que 10")\n i=i+1\n}endwhile""",
         )
 
 
@@ -102,6 +102,7 @@ def exit_action():
         icon="question",
         option_1="Cancelar",
         option_2="Sí",
+        justify="center",
     )
     response = msg.get()
 

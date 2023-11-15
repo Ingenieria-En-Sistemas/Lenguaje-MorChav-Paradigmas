@@ -1,21 +1,18 @@
-# Importa el lexer y el parser (deben estar definidos previamente)
 from Lexer import lexer
 from Parser import parse_program
-import ast
 
 # Diccionario para rastrear las variables y sus valores
 variables = {}
 
 
 def evaluate(nodes):
-    last_result = None  # Variable para almacenar el valor del último nodo visitado
-
+    results = []  # Almacena todos los resultados de la ejecución
     for node in nodes:
         result = evaluate_single(node)
         if result is not None:
-            last_result = result
+            results.append(result)  # Extiende la lista de resultados
 
-    return last_result
+    return results
 
 
 def evaluate_single(node):
@@ -24,11 +21,11 @@ def evaluate_single(node):
         for child in node:
             result = evaluate_single(child)
             if result is not None:
-                results.append(result)
+                results.append(result)  # Extiende la lista de resultados
         return results
 
     if node.type == "NUMBER":
-        return node.value
+        return node.value  # Devuelve directamente el valor numérico
     if node.type == "PLUS":
         left = evaluate_single(node.children[0])
         right = evaluate_single(node.children[1])
@@ -61,22 +58,53 @@ def evaluate_single(node):
         left = evaluate_single(node.children[0])
         right = evaluate_single(node.children[1])
         return left == right
-    if node.type == "DRACARYS":
+    if node.type == "WHILE":
+        condition = node.children[0]
+        body = node.children[1]
+
+        # Lista para almacenar los resultados de las iteraciones
+        results = []
+
+        while evaluate_single(condition):
+            result = evaluate_single(body)
+            results.extend(result)
+
+        return results  # Devolver la lista de resultados de las iteraciones
+
+    if node.type == "VIAJE":
+        variable_name = node.children[0].children[1].value
+        initial_value = node.children[0].children[2].value  # El valor inicial es un nodo
+        final_value = node.children[1].value
+        step = node.children[2].value
+        body = node.children[3]  # El cuerpo del bucle
+
+        # Lista para almacenar los resultados de las iteraciones
+        results = []
+
+        for i in range(initial_value, final_value + 1, step):
+            # Agregar la variable de control al diccionario de variables
+            variables[variable_name] = i
+            result = evaluate_single(body)
+            results.append(result)  # Agrega el resultado de la iteración actual
+
+        return results  # Devolver la lista de resultados de las iteraciones
+
+    elif node.type == "DRACARYS":
         if node.children:
             dracarys_content = evaluate_single(node.children[0])
             return dracarys_content
         elif node.value:  # Manejar el caso donde DRACARYS es una variable
             return evaluate_single(node.value)
-    if node.type == "STRING":
+    if node.type == "LOBOS":
         string_content = node.value
         if string_content and (
             string_content[0] == string_content[-1]
             and (string_content[0] == '"' or string_content[0] == "'")
         ):
-            return string_content[1:-1]
+            return [string_content[1:-1]]  # Devuelve el contenido de la cadena sin comillas como una lista
         else:
-            return string_content
-    if node.type == "IF":
+            return [string_content]
+    if node.type == "NORTE":
         condition = evaluate_single(node.children[0])
         if condition:
             return evaluate_single(node.children[1])
@@ -92,9 +120,21 @@ def evaluate_single(node):
             variable_name = node.children[1].value
             variable_value = evaluate_single(node.children[3])
             variables[variable_name] = variable_value
-            return f"{variable_name} = {variable_value}"
     if node.type == "VARIABLE":
         variable_name = node.value
         if variable_name in variables:
             return variables[variable_name]
+    if node.type == "VARIABLE_ASSIGNMENT":
+        variable_name = node.children[0].value
+        variable_value = evaluate_single(node.children[2])
+        variables[variable_name] = variable_value
     return None
+
+program = """
+espada i = 1
+"""
+tokens = lexer(program)
+ast = parse_program(tokens)
+results = evaluate(ast)  # Ahora devuelve una lista de resultados
+for result in results:
+    print(result)

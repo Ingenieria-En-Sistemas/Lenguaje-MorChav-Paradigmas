@@ -13,22 +13,9 @@ class Node:
         self.value = value
 
 
-class ForNode:
-    def __init__(self, variable, initial_value, final_value, step, body):
-        self.type = "FOR"
-        self.variable = variable
-        self.initial_value = initial_value
-        self.final_value = final_value
-        self.step = step
-        self.body = body
-
-
 # Diccionario para rastrear las variables y sus valores
 variables = {}
 
-
-# Función para el símbolo no terminal "programa"
-# Función para el símbolo no terminal "programa"
 def parse_program(tokens):
     statements = []
     while tokens:
@@ -36,11 +23,19 @@ def parse_program(tokens):
             # Si el token actual es una declaración de variable, procesarla como tal
             variable_declaration = parse_variable_declaration(tokens)
             statements.append(variable_declaration)
-        elif tokens[0].type == "FOR":
-            # Si el token actual es un bucle FOR, procesarlo como tal
+        elif tokens[0].type == "VIAJE":
+            # Si el token actual es un bucle VIAJE, procesarlo como tal
             for_statement = parse_for_statement(tokens)
             statements.append(for_statement)
-        elif tokens[0].type == "IF":
+        elif tokens[0].type == "WHILE":
+            # Verifica si solo quedan 2 tokens y el siguiente token es "ENDWHILE"
+            if len(tokens) == 2 and tokens[1].type == "ENDWHILE":
+                return parse_while_statement(tokens)
+            else:
+                # Si no es el caso, procesa el bucle WHILE normalmente
+                while_statement = parse_while_statement(tokens)
+                statements.append(while_statement)
+        elif tokens[0].type == "NORTE":
             # Si el token actual es una expresión condicional (if), procesarlo como tal
             if_statement = parse_if_statement(tokens)
             statements.append(if_statement)
@@ -51,30 +46,77 @@ def parse_program(tokens):
     return statements
 
 
+
 # Función para el símbolo no terminal "sentencia"
 def parse_single_statement(tokens):
-    if tokens[0].type == "IF":
+    if tokens[0].type == "NORTE":
         return parse_if_statement(tokens)
-    elif tokens[0].type == "ELSE":
+    elif tokens[0].type == "SUR":
         return parse_else_statement(tokens)
     elif tokens[0].type == "DRACARYS":
         return parse_dracarys(tokens)
     elif tokens[0].type == "LBRACE":
         return parse_block(tokens)
-    elif tokens[0].type == "FOR":
+    elif tokens[0].type == "RBRACE":
+        return parse_while_block(tokens)
+    elif tokens[0].type == "VIAJE":
         return parse_for_statement(tokens)
+    if tokens[0].type == "WHILE":
+        return parse_while_statement(tokens)
     elif tokens[0].type == "TYPE":  # Identifica las declaraciones de variables
         return parse_variable_declaration(tokens)
     return expression(tokens)
 
+# Función para el símbolo no terminal "sentencia_while"
+def parse_while_statement(tokens):
+    tokens.pop(0)  # Consume 'WHILE'
+    condition = expression(tokens)
 
-# Función para analizar la declaración de una variable
+    # Verifica si hay una apertura de llave '{'
+    if tokens[0].type == "LBRACE":
+        tokens.pop(0)  # Consume '{'
+
+        # Obtiene el cuerpo del bucle usando la nueva función parse_while_block
+        body = parse_while_block(tokens)
+
+        # Verifica si hay un cierre de llave '}'
+        if tokens[0].type == "ENDWHILE":
+            tokens.pop(0)  # Consume 'endwhile'
+            return Node("WHILE", [condition, body])
+        else:
+            raise SyntaxError("Error de sintaxis: Se esperaba '}' después del cuerpo del bucle WHILE.")
+    else:
+        raise SyntaxError("Error de sintaxis: Se esperaba '{' al comienzo del cuerpo del bucle WHILE.")
+    
+
+
+def parse_boolean(tokens):
+    if tokens[0].type == "TRUE" or tokens[0].type == "FALSE":
+        return Node("BOOLEAN", value=(tokens.pop(0).type == "TRUE"))
+    raise SyntaxError(f"Error de sintaxis: Token inesperado '{tokens[0].type}' en parse_boolean.")
+
 def parse_variable_declaration(tokens):
-    var_type = tokens.pop(0).value  # Tipo de variable (int, string, etc.)
+    var_type = tokens.pop(0).value  # Tipo de variable (espada, string, etc.)
     variable_name = tokens.pop(0).value  # Nombre de la variable
     if tokens[0].type == "ASSIGN":
         tokens.pop(0)  # Consume '='
-        value = expression(tokens)
+        if var_type == 'espada':
+            if tokens[0].type == "NUMBER":
+                value = expression(tokens)
+            else:
+                raise SyntaxError("Error de sintaxis: Se esperaba un número entero como valor para 'espada'.")
+        elif var_type == 'lobos':
+            if tokens[0].type == "STRING":
+                value = expression(tokens)
+            else:
+                raise SyntaxError("Error de sintaxis: Se esperaba una cadena entre comillas como valor para 'LOBOS'.")
+        elif var_type == 'bool':
+            # Agrega la lógica para bool aquí si es necesario
+            pass
+        else:
+            # Agrega la lógica para otros tipos aquí si es necesario
+            pass
+
         variables[variable_name] = value
         return Node(
             "VARIABLE_DECLARATION",
@@ -90,6 +132,26 @@ def parse_variable_declaration(tokens):
             "Error de sintaxis: Se esperaba '=' después del nombre de la variable."
         )
 
+def parse_variable_assignment(tokens):
+    variable_name = tokens.pop(0).value
+    if tokens[0].type == "ASSIGN":
+        tokens.pop(0)  # Consume '='
+        value = expression(tokens)
+        variables[variable_name] = value
+        return Node(
+            "VARIABLE_ASSIGNMENT",
+            children=[
+                Node("VARIABLE", value=variable_name),
+                Node("ASSIGN"),
+                value,
+            ],
+        )
+    else:
+        raise SyntaxError(
+            "Error de sintaxis: Se esperaba '=' después del nombre de la variable."
+        )
+
+
 
 # Función para analizar una referencia a una variable
 def parse_variable_reference(tokens):
@@ -100,78 +162,93 @@ def parse_variable_reference(tokens):
         raise NameError(f"La variable '{variable_name}' no está definida.")
 
 
-# Función para analizar un bucle FOR
+# ...
+
 def parse_for_statement(tokens):
-    tokens.pop(0)  # Consume 'FOR'
-    if tokens[0].type == "LPAREN":  # Corrige el token esperado
+    tokens.pop(0)  # Consume 'VIAJE'
+    if tokens[0].type == "LPAREN":
         tokens.pop(0)  # Consume '('
-        variable = tokens.pop(0)
-        if variable.type == "VARIABLE":
+
+        # Parsea la declaración de la variable y la inicialización
+        if tokens[0].type == "TYPE":
+            var_type = tokens.pop(0).value  # Tipo de variable (int, string, etc.)
+            variable = tokens.pop(0).value  # Nombre de la variable
+            initial_value = None  # Inicialmente, no hay valor asignado
+
             if tokens[0].type == "ASSIGN":
                 tokens.pop(0)  # Consume '='
-                initial_value = expression(tokens)
-                if tokens[0].type == "TO":
-                    tokens.pop(0)  # Consume 'TO'
-                    final_value = expression(tokens)
-                    step = 1  # Valor por defecto para el paso
-                    if tokens and tokens[0].type == "STEP":
-                        tokens.pop(0)  # Consume 'STEP'
-                        step = int(
-                            tokens.pop(0).value
-                        )  # Convierte el valor del token en un número entero
-                    if tokens[0].type == "RPAREN":
-                        tokens.pop(0)  # Consume ')'  # Corrige el token esperado
-                        body = parse_single_statement(tokens)
-                        return ForNode(
-                            variable.value, initial_value, final_value, step, body
-                        )
-                    else:
-                        raise SyntaxError(
-                            "Error de sintaxis: Se esperaba ')' al final del bucle FOR."
-                        )
-                else:
-                    raise SyntaxError(
-                        "Error de sintaxis: Se esperaba 'TO' en la definición del bucle FOR."
-                    )
+                initial_value = expression(tokens)  # Parsea la expresión inicial
             else:
-                raise SyntaxError(
-                    "Error de sintaxis: Se esperaba '=' en la definición del bucle FOR."
-                )
+                raise SyntaxError("Error de sintaxis: Se esperaba '=' en la definición del bucle VIAJE.")
+
+            # Verifica la palabra clave 'TO'
+            if tokens[0].type == "TO":
+                tokens.pop(0)  # Consume 'TO'
+
+                # Parsea la expresión final y el paso si está presente
+                final_value = expression(tokens)
+                step = None
+                if tokens[0].type == "STEP":
+                    tokens.pop(0)  # Consume 'STEP'
+                    step = expression(tokens)
+
+                # Verifica la existencia de un paréntesis derecho ')'
+                if tokens[0].type == "RPAREN":
+                    tokens.pop(0)  # Consume ')'
+
+                    # Parsea el cuerpo del bucle
+                    body = parse_single_statement(tokens)
+
+                    # Crea el nodo 'VIAJE' utilizando la clase 'Node'
+                    return Node(
+                        "VIAJE",
+                        children=[
+                            Node("VARIABLE_DECLARATION", children=[
+                                Node("TYPE", value=var_type),
+                                Node("VARIABLE", value=variable),
+                                initial_value,
+                            ]),
+                            Node("FINAL_VALUE", value=final_value.value),
+                            Node("STEP", value=step.value if step else None),
+                            body
+                        ]
+                    )
+                else:
+                    raise SyntaxError("Error de sintaxis: Se esperaba ')' al final del bucle VIAJE.")
+            else:
+                raise SyntaxError("Error de sintaxis: Se esperaba 'TO' en la definición del bucle VIAJE.")
         else:
-            raise SyntaxError(
-                "Error de sintaxis: Se esperaba un nombre de variable en la definición del bucle FOR."
-            )
+            raise SyntaxError("Error de sintaxis: Se esperaba el tipo de variable en la definición del bucle VIAJE.")
     else:
-        raise SyntaxError(
-            "Error de sintaxis: Se esperaba '(' en la definición del bucle FOR."
-        )
+        raise SyntaxError("Error de sintaxis: Se esperaba '(' en la definición del bucle VIAJE.")
+
 
 
 def parse_if_statement(tokens):
-    tokens.pop(0)  # Consume 'IF'
+    tokens.pop(0)  # Consume 'NORTE'
     condition = expression(tokens)
     if_statement = parse_single_statement(tokens)
     else_statement = None  # Inicialmente, no hay un 'ELSE' statement
 
     # Comprueba si hay 'ELSE'
-    if tokens and tokens[0].type == "ELSE":
+    if tokens and tokens[0].type == "SUR":
         tokens.pop(0)  # Consume 'ELSE'
         else_statement = parse_single_statement(tokens)
 
     # Busca 'ENDIF' sin importar los espacios en blanco
-    if tokens and tokens[0].type == "ENDIF":
+    if tokens and tokens[0].type == "ENDNORTE":
         tokens.pop(0)  # Consume 'ENDIF'
-        return Node("IF", [condition, if_statement, else_statement])
+        return Node("NORTE", [condition, if_statement, else_statement])
 
     raise SyntaxError(
-        "Error de sintaxis: Se esperaba 'ENDIF' al final de la declaración condicional."
+        "Error de sintaxis: Se esperaba 'ENDNORTE' al final de la declaración condicional."
     )
 
 
 def parse_else_statement(tokens):
     tokens.pop(0)  # Consume 'ELSE'
     else_statement = parse_single_statement(tokens)
-    return Node("ELSE", [else_statement])
+    return Node("SUR", [else_statement])
 
 
 # Función para el símbolo no terminal "expresión"
@@ -231,22 +308,24 @@ def multiplication(tokens):
 def factor(tokens):
     if tokens[0].type == "NUMBER":
         return Node("NUMBER", value=int(tokens.pop(0).value))
+    elif tokens[0].type == "TRUE" or tokens[0].type == "FALSE":
+        return parse_boolean(tokens)
     elif tokens[0].type == "LPAREN":
         tokens.pop(0)  # Consume el paréntesis izquierdo
-        if tokens[0].type == "IF":
+        if tokens[0].type == "NORTE":
             # Manejar una expresión condicional (if)
             condition = expression(tokens)
             if tokens[0].type == "RPAREN":
                 tokens.pop(0)  # Consume el paréntesis derecho
-                # Manejar las ramas "THEN" y "ELSE" si fuera necesario
+                # Manejar las ramas "THEN" y "SUR" si fuera necesario
                 then_expression = factor(tokens)
-                if tokens[0].type == "ELSE":
-                    tokens.pop(0)  # Consume 'ELSE'
+                if tokens[0].type == "SUR":
+                    tokens.pop(0)  # Consume 'SUR'
                     else_expression = factor(tokens)
                     return Node(
-                        "IF", children=[condition, then_expression, else_expression]
+                        "NORTE", children=[condition, then_expression, else_expression]
                     )
-                return Node("IF", children=[condition, then_expression])
+                return Node("NORTE", children=[condition, then_expression])
             else:
                 raise SyntaxError(
                     "Error de sintaxis: Se esperaba ')' después de la condición en la expresión condicional."
@@ -259,9 +338,12 @@ def factor(tokens):
     elif tokens[0].type == "DRACARYS":
         return parse_dracarys(tokens)
     elif tokens[0].type == "STRING":
-        return Node("STRING", value=tokens.pop(0).value)
+        return Node("LOBOS", value=tokens.pop(0).value)
     elif tokens[0].type == "VARIABLE":
-        return Node("VARIABLE", value=tokens.pop(0).value)
+        if tokens[1].type == "ASSIGN":
+            return parse_variable_assignment(tokens)
+        else:
+            return Node("VARIABLE", value=tokens.pop(0).value)
     raise SyntaxError(
         f"Error de sintaxis: Token inesperado '{tokens[0].type}' en factor."
     )
@@ -275,7 +357,10 @@ def parse_dracarys(tokens):
         if tokens[0].type == "RPAREN":
             tokens.pop(0)  # Consume ')'
             result_node = Node("DRACARYS", children=[expression_node])
-            return result_node
+            if result_node.children[0].value in variables:
+                return result_node
+            else:
+                return result_node
         else:
             raise SyntaxError(
                 "Error de sintaxis: Se esperaba ')' después de la expresión."
@@ -283,6 +368,12 @@ def parse_dracarys(tokens):
     elif tokens[0].type == "STRING":
         string_node = tokens.pop(0).value
         return Node("DRACARYS", value=string_node)
+    elif tokens[0].type == "VARIABLE":
+        variable_node = tokens.pop(0).value
+        return Node("DRACARYS", value=variable_node)
+    elif tokens[0].type == "NUMBER":
+        number_node = tokens.pop(0).value
+        return Node("DRACARYS", value=number_node)
     else:
         raise SyntaxError(
             "Error de sintaxis: Se esperaba '(' o una cadena después de 'DRACARYS'."
@@ -305,39 +396,41 @@ def parse_block(tokens):
 
     return statements
 
+def parse_while_block(tokens):
+    statements = []
+
+    while tokens and tokens[0].type != "RBRACE":
+        statement = parse_single_statement(tokens)
+        statements.append(statement)
+
+    if tokens and tokens[0].type == "RBRACE":
+        tokens.pop(0)  # Consume '}'
+    else:
+        raise SyntaxError("Error de sintaxis: Falta '}' al final del bloque WHILE.")
+
+    return statements
+
 
 def print_ast(node, level=0):
-    if isinstance(node, list):
-        for item in node:
-            print_ast(item, level)
-    else:
-        if node is None:
-            return
-        if isinstance(node, ForNode):
-            print("  " * level + node.type)
-            print("  " * (level + 1) + f"Variable: {node.variable}")
-            print("  " * (level + 1) + f"Initial Value: {node.initial_value.value}")
-            print("  " * (level + 1) + f"Final Value: {node.final_value.value}")
-            print("  " * (level + 1) + f"Step: {node.step}")
-            print("  " * (level + 1) + "Body:")
-            if isinstance(node.body, list):
-                for child in node.body:
-                    print_ast(
-                        child, level + 2
-                    )  # Imprime los elementos del cuerpo del bucle FOR
-            else:
-                print_ast(node.body, level + 2)  # Imprime el cuerpo del bucle FOR
-        else:
-            print("  " * level + node.type + (f" ({node.value})" if node.value else ""))
+    if isinstance(node, Node):
+        print("  " * level + node.type + (f" ({node.value})" if node.value else ""))
         if hasattr(node, "children"):
             for child in node.children:
                 print_ast(child, level + 1)
+    elif isinstance(node, list):
+        for item in node:
+            print_ast(item, level)
+    else:
+        print("  " * level + str(node))
+
 
 
 # Ejemplo de entrada con un bucle FOR
-entrada_ejemplo = """int a = 2
-int b = 3
-dracarys(a + b)"""
+entrada_ejemplo = """ 
+espada i = 1
+i = 3
+dracarys(i)
+ """
 
 # Llama al lexer con el ejemplo de entrada
 tokens_ejemplo = lexer(entrada_ejemplo)

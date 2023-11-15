@@ -12,7 +12,6 @@ from tkinter import messagebox
 customtkinter.set_appearance_mode("System")
 customtkinter.set_default_color_theme("dark-blue")
 
-
 def execute_expression():
     input_expr = input_text.get("1.0", "end-1c")
     try:
@@ -107,13 +106,13 @@ option_container.pack(side="top", pady=10)
 
 # Cargar las imágenes como CTkImage y ajustar el tamaño
 run_image = Image.open("run.png")
-run_icon = CTkImage(light_image=run_image, size=(45, 45))
+run_icon = CTkImage(light_image=run_image, size=(35, 20))
 
 exit_image = Image.open("exit.png")
-exit_icon = CTkImage(light_image=exit_image, size=(45, 45))
+exit_icon = CTkImage(light_image=exit_image, size=(35, 35))
 
 new_image = Image.open("new.png")
-new_icon = CTkImage(light_image=new_image, size=(45, 45))
+new_icon = CTkImage(light_image=new_image, size=(35, 35))
 
 clear_image = Image.open("clear.png")
 clear_icon = CTkImage(light_image=clear_image, size=(45, 45))
@@ -131,7 +130,7 @@ combobox.pack(side="left", padx=20)
 combobox.set("Opciones")
 
 
-add_selected_option_button = customtkinter.CTkButton(option_container,height=55,width=160, text="Agregar ", command=add_selected_option_to_input_text)
+add_selected_option_button = customtkinter.CTkButton(option_container,height=55,width=160,image=run_icon, text="Agregar ", command=add_selected_option_to_input_text)
 add_selected_option_button.configure(font=("Consolas", 17))
 add_selected_option_button.pack(side="left", padx=20)
 
@@ -141,7 +140,7 @@ new_button.configure(font=("Consolas", 17))
 new_button.pack(side="left", padx=10)
 
 # Crear el botón para ejecutar la expresión con el icono
-execute_button = customtkinter.CTkButton(button_container, text="Ejecutar", image=run_icon, compound="left", command=execute_expression, fg_color="green",text_color="black")
+execute_button = customtkinter.CTkButton(button_container, text="Ejecutar", image=clear_icon, compound="left", command=execute_expression, fg_color="green",text_color="black")
 execute_button.configure(font=("Consolas", 17))
 execute_button.pack(side="left", padx=10)
 

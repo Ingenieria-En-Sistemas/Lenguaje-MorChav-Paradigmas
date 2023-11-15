@@ -6,13 +6,13 @@ variables = {}
 
 
 def evaluate(nodes):
-    results = []  # Almacena todos los resultados de la ejecución
+    all_results = []  # Almacena todos los resultados de la ejecución
     for node in nodes:
         result = evaluate_single(node)
         if result is not None:
-            results.append(result)  # Extiende la lista de resultados
+            all_results.append(result)  # Extiende la lista de resultados
 
-    return results
+    return all_results
 
 
 def evaluate_single(node):
@@ -73,7 +73,9 @@ def evaluate_single(node):
 
     if node.type == "VIAJE":
         variable_name = node.children[0].children[1].value
-        initial_value = node.children[0].children[2].value  # El valor inicial es un nodo
+        initial_value = (
+            node.children[0].children[2].value
+        )  # El valor inicial es un nodo
         final_value = node.children[1].value
         step = node.children[2].value
         body = node.children[3]  # El cuerpo del bucle
@@ -101,7 +103,9 @@ def evaluate_single(node):
             string_content[0] == string_content[-1]
             and (string_content[0] == '"' or string_content[0] == "'")
         ):
-            return [string_content[1:-1]]  # Devuelve el contenido de la cadena sin comillas como una lista
+            return [
+                string_content[1:-1]
+            ]  # Devuelve el contenido de la cadena sin comillas como una lista
         else:
             return [string_content]
     if node.type == "NORTE":
@@ -129,6 +133,7 @@ def evaluate_single(node):
         variable_value = evaluate_single(node.children[2])
         variables[variable_name] = variable_value
     return None
+
 
 program = """
 espada i = 1

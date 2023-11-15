@@ -16,6 +16,7 @@ class Node:
 # Diccionario para rastrear las variables y sus valores
 variables = {}
 
+
 def parse_program(tokens):
     statements = []
     while tokens:
@@ -46,7 +47,6 @@ def parse_program(tokens):
     return statements
 
 
-
 # Función para el símbolo no terminal "sentencia"
 def parse_single_statement(tokens):
     if tokens[0].type == "NORTE":
@@ -67,6 +67,7 @@ def parse_single_statement(tokens):
         return parse_variable_declaration(tokens)
     return expression(tokens)
 
+
 # Función para el símbolo no terminal "sentencia_while"
 def parse_while_statement(tokens):
     tokens.pop(0)  # Consume 'WHILE'
@@ -84,33 +85,43 @@ def parse_while_statement(tokens):
             tokens.pop(0)  # Consume 'endwhile'
             return Node("WHILE", [condition, body])
         else:
-            raise SyntaxError("Error de sintaxis: Se esperaba '}' después del cuerpo del bucle WHILE.")
+            raise SyntaxError(
+                "Error de sintaxis: Se esperaba '}' después del cuerpo del bucle WHILE."
+            )
     else:
-        raise SyntaxError("Error de sintaxis: Se esperaba '{' al comienzo del cuerpo del bucle WHILE.")
-    
+        raise SyntaxError(
+            "Error de sintaxis: Se esperaba '{' al comienzo del cuerpo del bucle WHILE."
+        )
 
 
 def parse_boolean(tokens):
     if tokens[0].type == "TRUE" or tokens[0].type == "FALSE":
         return Node("BOOLEAN", value=(tokens.pop(0).type == "TRUE"))
-    raise SyntaxError(f"Error de sintaxis: Token inesperado '{tokens[0].type}' en parse_boolean.")
+    raise SyntaxError(
+        f"Error de sintaxis: Token inesperado '{tokens[0].type}' en parse_boolean."
+    )
+
 
 def parse_variable_declaration(tokens):
     var_type = tokens.pop(0).value  # Tipo de variable (espada, string, etc.)
     variable_name = tokens.pop(0).value  # Nombre de la variable
     if tokens[0].type == "ASSIGN":
         tokens.pop(0)  # Consume '='
-        if var_type == 'espada':
+        if var_type == "espada":
             if tokens[0].type == "NUMBER":
                 value = expression(tokens)
             else:
-                raise SyntaxError("Error de sintaxis: Se esperaba un número entero como valor para 'espada'.")
-        elif var_type == 'lobos':
+                raise SyntaxError(
+                    "Error de sintaxis: Se esperaba un número entero como valor para 'espada'."
+                )
+        elif var_type == "lobos":
             if tokens[0].type == "STRING":
                 value = expression(tokens)
             else:
-                raise SyntaxError("Error de sintaxis: Se esperaba una cadena entre comillas como valor para 'LOBOS'.")
-        elif var_type == 'bool':
+                raise SyntaxError(
+                    "Error de sintaxis: Se esperaba una cadena entre comillas como valor para 'LOBOS'."
+                )
+        elif var_type == "bool":
             # Agrega la lógica para bool aquí si es necesario
             pass
         else:
@@ -132,6 +143,7 @@ def parse_variable_declaration(tokens):
             "Error de sintaxis: Se esperaba '=' después del nombre de la variable."
         )
 
+
 def parse_variable_assignment(tokens):
     variable_name = tokens.pop(0).value
     if tokens[0].type == "ASSIGN":
@@ -152,7 +164,6 @@ def parse_variable_assignment(tokens):
         )
 
 
-
 # Función para analizar una referencia a una variable
 def parse_variable_reference(tokens):
     variable_name = tokens.pop(0).value
@@ -162,7 +173,6 @@ def parse_variable_reference(tokens):
         raise NameError(f"La variable '{variable_name}' no está definida.")
 
 
-# ...
 
 def parse_for_statement(tokens):
     tokens.pop(0)  # Consume 'VIAJE'
@@ -179,7 +189,9 @@ def parse_for_statement(tokens):
                 tokens.pop(0)  # Consume '='
                 initial_value = expression(tokens)  # Parsea la expresión inicial
             else:
-                raise SyntaxError("Error de sintaxis: Se esperaba '=' en la definición del bucle VIAJE.")
+                raise SyntaxError(
+                    "Error de sintaxis: Se esperaba '=' en la definición del bucle VIAJE."
+                )
 
             # Verifica la palabra clave 'TO'
             if tokens[0].type == "TO":
@@ -203,25 +215,35 @@ def parse_for_statement(tokens):
                     return Node(
                         "VIAJE",
                         children=[
-                            Node("VARIABLE_DECLARATION", children=[
-                                Node("TYPE", value=var_type),
-                                Node("VARIABLE", value=variable),
-                                initial_value,
-                            ]),
+                            Node(
+                                "VARIABLE_DECLARATION",
+                                children=[
+                                    Node("TYPE", value=var_type),
+                                    Node("VARIABLE", value=variable),
+                                    initial_value,
+                                ],
+                            ),
                             Node("FINAL_VALUE", value=final_value.value),
                             Node("STEP", value=step.value if step else None),
-                            body
-                        ]
+                            body,
+                        ],
                     )
                 else:
-                    raise SyntaxError("Error de sintaxis: Se esperaba ')' al final del bucle VIAJE.")
+                    raise SyntaxError(
+                        "Error de sintaxis: Se esperaba ')' al final del bucle VIAJE."
+                    )
             else:
-                raise SyntaxError("Error de sintaxis: Se esperaba 'TO' en la definición del bucle VIAJE.")
+                raise SyntaxError(
+                    "Error de sintaxis: Se esperaba 'TO' en la definición del bucle VIAJE."
+                )
         else:
-            raise SyntaxError("Error de sintaxis: Se esperaba el tipo de variable en la definición del bucle VIAJE.")
+            raise SyntaxError(
+                "Error de sintaxis: Se esperaba el tipo de variable en la definición del bucle VIAJE."
+            )
     else:
-        raise SyntaxError("Error de sintaxis: Se esperaba '(' en la definición del bucle VIAJE.")
-
+        raise SyntaxError(
+            "Error de sintaxis: Se esperaba '(' en la definición del bucle VIAJE."
+        )
 
 
 def parse_if_statement(tokens):
@@ -396,6 +418,7 @@ def parse_block(tokens):
 
     return statements
 
+
 def parse_while_block(tokens):
     statements = []
 
@@ -424,13 +447,14 @@ def print_ast(node, level=0):
         print("  " * level + str(node))
 
 
-
 # Ejemplo de entrada con un bucle FOR
 entrada_ejemplo = """ 
+
 espada i = 1
 i = 3
 dracarys(i)
- """
+
+"""
 
 # Llama al lexer con el ejemplo de entrada
 tokens_ejemplo = lexer(entrada_ejemplo)

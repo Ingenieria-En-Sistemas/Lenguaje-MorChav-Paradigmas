@@ -94,6 +94,7 @@ def parse_boolean(tokens):
     if tokens[0].type == "TRUE" or tokens[0].type == "FALSE":
         return Node("BOOLEAN", value=(tokens.pop(0).type == "TRUE"))
     raise SyntaxError(f"Error de sintaxis: Token inesperado '{tokens[0].type}' en parse_boolean.")
+
 def parse_variable_declaration(tokens):
     var_type = tokens.pop(0).value  # Tipo de variable (espada, string, etc.)
     variable_name = tokens.pop(0).value  # Nombre de la variable
@@ -121,6 +122,25 @@ def parse_variable_declaration(tokens):
             "VARIABLE_DECLARATION",
             children=[
                 Node("TYPE", value=var_type),
+                Node("VARIABLE", value=variable_name),
+                Node("ASSIGN"),
+                value,
+            ],
+        )
+    else:
+        raise SyntaxError(
+            "Error de sintaxis: Se esperaba '=' después del nombre de la variable."
+        )
+
+def parse_variable_assignment(tokens):
+    variable_name = tokens.pop(0).value
+    if tokens[0].type == "ASSIGN":
+        tokens.pop(0)  # Consume '='
+        value = expression(tokens)
+        variables[variable_name] = value
+        return Node(
+            "VARIABLE_ASSIGNMENT",
+            children=[
                 Node("VARIABLE", value=variable_name),
                 Node("ASSIGN"),
                 value,
@@ -320,7 +340,10 @@ def factor(tokens):
     elif tokens[0].type == "STRING":
         return Node("LOBOS", value=tokens.pop(0).value)
     elif tokens[0].type == "VARIABLE":
-        return Node("VARIABLE", value=tokens.pop(0).value)
+        if tokens[1].type == "ASSIGN":
+            return parse_variable_assignment(tokens)
+        else:
+            return Node("VARIABLE", value=tokens.pop(0).value)
     raise SyntaxError(
         f"Error de sintaxis: Token inesperado '{tokens[0].type}' en factor."
     )
@@ -334,7 +357,10 @@ def parse_dracarys(tokens):
         if tokens[0].type == "RPAREN":
             tokens.pop(0)  # Consume ')'
             result_node = Node("DRACARYS", children=[expression_node])
-            return result_node
+            if result_node.children[0].value in variables:
+                return result_node
+            else:
+                return result_node
         else:
             raise SyntaxError(
                 "Error de sintaxis: Se esperaba ')' después de la expresión."
@@ -342,6 +368,12 @@ def parse_dracarys(tokens):
     elif tokens[0].type == "STRING":
         string_node = tokens.pop(0).value
         return Node("DRACARYS", value=string_node)
+    elif tokens[0].type == "VARIABLE":
+        variable_node = tokens.pop(0).value
+        return Node("DRACARYS", value=variable_node)
+    elif tokens[0].type == "NUMBER":
+        number_node = tokens.pop(0).value
+        return Node("DRACARYS", value=number_node)
     else:
         raise SyntaxError(
             "Error de sintaxis: Se esperaba '(' o una cadena después de 'DRACARYS'."
@@ -395,8 +427,9 @@ def print_ast(node, level=0):
 
 # Ejemplo de entrada con un bucle FOR
 entrada_ejemplo = """ 
-VIAJE(espada i = 1 to 10 step 2) dracarys(i*2)
-
+espada i = 1
+i = 3
+dracarys(i)
  """
 
 # Llama al lexer con el ejemplo de entrada

@@ -10,7 +10,7 @@ def evaluate(nodes):
     for node in nodes:
         result = evaluate_single(node)
         if result is not None:
-            results.extend(result)  # Extiende la lista de resultados
+            results.append(result)  # Extiende la lista de resultados
 
     return results
 
@@ -21,7 +21,7 @@ def evaluate_single(node):
         for child in node:
             result = evaluate_single(child)
             if result is not None:
-                results.extend(result)  # Extiende la lista de resultados
+                results.append(result)  # Extiende la lista de resultados
         return results
 
     if node.type == "NUMBER":
@@ -125,12 +125,18 @@ def evaluate_single(node):
         variable_name = node.value
         if variable_name in variables:
             return variables[variable_name]
+    if node.type == "VARIABLE_ASSIGNMENT":
+        variable_name = node.children[0].value
+        variable_value = evaluate_single(node.children[1])
+        variables[variable_name] = variable_value
+        return [f"{variable_name} = {variable_value}"]
     return None
 
 # Código de prueba
 program = """
-VIAJE(espada i = 1 to 10 step 1) dracarys(i*2)
-dracarys('Hola mundo')
+espada i = 1
+i = 3
+dracarys(i)
 """
 tokens = lexer(program)
 ast = parse_program(tokens)

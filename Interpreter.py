@@ -120,23 +120,18 @@ def evaluate_single(node):
             variable_name = node.children[1].value
             variable_value = evaluate_single(node.children[3])
             variables[variable_name] = variable_value
-            return [f"{variable_name} = {variable_value}"]
     if node.type == "VARIABLE":
         variable_name = node.value
         if variable_name in variables:
             return variables[variable_name]
     if node.type == "VARIABLE_ASSIGNMENT":
         variable_name = node.children[0].value
-        variable_value = evaluate_single(node.children[1])
+        variable_value = evaluate_single(node.children[2])
         variables[variable_name] = variable_value
-        return [f"{variable_name} = {variable_value}"]
     return None
 
-# Código de prueba
 program = """
 espada i = 1
-i = 3
-dracarys(i)
 """
 tokens = lexer(program)
 ast = parse_program(tokens)

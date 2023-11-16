@@ -15,7 +15,6 @@ def evaluate(nodes):
     return all_results
 
 
-
 def evaluate_single(node):
     if isinstance(node, list):
         results = []
@@ -142,6 +141,7 @@ espada i = 1 while(i<10){
 	DRACARYS("Menor que 10")
  i=i+1
 }endwhile
+
 """
 tokens = lexer(program)
 ast = parse_program(tokens)

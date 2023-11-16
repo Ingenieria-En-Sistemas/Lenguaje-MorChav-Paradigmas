@@ -138,7 +138,20 @@ clear_icon = CTkImage(light_image=clear_image, size=(45, 45))
 
 
 # Crear un campo de entrada de texto desplazable más grande
-input_text = customtkinter.CTkTextbox(app, wrap=customtkinter.WORD, height=250)
+tab_view = customtkinter.CTkTabview(master=app)
+tab_view.pack(expand=1, fill="both", padx=20, pady=20)
+
+# Agregar una pestaña por defecto
+tab_view.add("Tab 1")
+tab_view.add("Tab 2")
+
+# Obtener la referencia al primer CTkTextbox en la primera pestaña
+input_text = customtkinter.CTkTextbox(master=tab_view.tab("Tab 1"), wrap=customtkinter.WORD, height=250)
+input_text.configure(font=("Consolas", 17))
+input_text.pack(padx=10, pady=(10, 5), fill="both")
+
+# Obtener la referencia al primer CTkTextbox en la primera pestaña
+input_text = customtkinter.CTkTextbox(master=tab_view.tab("Tab 2"), wrap=customtkinter.WORD, height=250)
 input_text.configure(font=("Consolas", 17))
 input_text.pack(padx=10, pady=(10, 5), fill="both")
 
@@ -202,9 +215,12 @@ exit_button.configure(font=("Consolas", 17))
 exit_button.pack(side="left", padx=10)
 
 # Crear un campo de salida de texto desplazable más grande
-output_text = customtkinter.CTkTextbox(
-    app, state="disabled", wrap=customtkinter.WORD, height=200
-)
+
+output_text = customtkinter.CTkTextbox(master=tab_view.tab("Tab 1"), state="disabled", wrap=customtkinter.WORD, height=200)
+output_text.configure(font=("Consolas", 17))
+output_text.pack(padx=10, pady=(5, 10), fill="both")
+
+output_text = customtkinter.CTkTextbox(master=tab_view.tab("Tab 2"), state="disabled", wrap=customtkinter.WORD, height=200)
 output_text.configure(font=("Consolas", 17))
 output_text.pack(padx=10, pady=(5, 10), fill="both")
 

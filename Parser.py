@@ -28,9 +28,9 @@ def parse_program(tokens):
             # Si el token actual es un bucle VIAJE, procesarlo como tal
             for_statement = parse_for_statement(tokens)
             statements.append(for_statement)
-        elif tokens[0].type == "WHILE":
+        elif tokens[0].type == "CAMINO":
             # Verifica si solo quedan 2 tokens y el siguiente token es "ENDWHILE"
-            if len(tokens) == 2 and tokens[1].type == "ENDWHILE":
+            if len(tokens) == 2 and tokens[1].type == "ENDCAMINO":
                 return parse_while_statement(tokens)
             else:
                 # Si no es el caso, procesa el bucle WHILE normalmente
@@ -61,7 +61,7 @@ def parse_single_statement(tokens):
         return parse_while_block(tokens)
     elif tokens[0].type == "VIAJE":
         return parse_for_statement(tokens)
-    if tokens[0].type == "WHILE":
+    if tokens[0].type == "CAMINO":
         return parse_while_statement(tokens)
     elif tokens[0].type == "TYPE":  # Identifica las declaraciones de variables
         return parse_variable_declaration(tokens)
@@ -81,16 +81,16 @@ def parse_while_statement(tokens):
         body = parse_while_block(tokens)
 
         # Verifica si hay un cierre de llave '}'
-        if tokens[0].type == "ENDWHILE":
+        if tokens[0].type == "ENDCAMINO":
             tokens.pop(0)  # Consume 'endwhile'
-            return Node("WHILE", [condition, body])
+            return Node("CAMINO", [condition, body])
         else:
             raise SyntaxError(
-                "Error de sintaxis: Se esperaba '}' después del cuerpo del bucle WHILE."
+                "Error de sintaxis: Se esperaba '}' después del cuerpo del bucle CAMINO."
             )
     else:
         raise SyntaxError(
-            "Error de sintaxis: Se esperaba '{' al comienzo del cuerpo del bucle WHILE."
+            "Error de sintaxis: Se esperaba '{' al comienzo del cuerpo del bucle CAMINO."
         )
 
 
@@ -429,7 +429,7 @@ def parse_while_block(tokens):
     if tokens and tokens[0].type == "RBRACE":
         tokens.pop(0)  # Consume '}'
     else:
-        raise SyntaxError("Error de sintaxis: Falta '}' al final del bloque WHILE.")
+        raise SyntaxError("Error de sintaxis: Falta '}' al final del bloque CAMINO.")
 
     return statements
 

@@ -59,7 +59,7 @@ def evaluate_single(node):
         left = evaluate_single(node.children[0])
         right = evaluate_single(node.children[1])
         return left == right
-    if node.type == "WHILE":
+    if node.type == "CAMINO":
         condition = node.children[0]
         body = node.children[1]
 
@@ -138,10 +138,10 @@ def evaluate_single(node):
 
 program = """
 
-espada i = 1 while(i<10){
+espada i = 1 CAMINO(i<10){
 	DRACARYS("Menor que 10")
  i=i+1
-}endwhile
+}endCAMINO
 """
 tokens = lexer(program)
 ast = parse_program(tokens)

@@ -73,7 +73,7 @@ def add_selected_option_to_input_text():
     elif selected_option == "WHILE":
         input_text.insert(
             "end",
-            """\nespada i = 1 while(i<10){\n\tDRACARYS("Menor que 10")\n i=i+1\n}endwhile""",
+            """\nespada i = 1 CAMINO(i<10){\n\tDRACARYS("Menor que 10")\n i=i+1\n}ENDCAMINO""",
         )
 
 

@@ -133,15 +133,22 @@ def evaluate_single(node):
         variable_name = node.children[0].value
         variable_value = evaluate_single(node.children[2])
         variables[variable_name] = variable_value
+        #TODO: Agregarle hijos al nodo INPUT
+    if node.type == "INPUT":
+        message = evaluate_single(node.value[0])
+        variable_name = node.value[1]
+        user_input = input(f"{message} ({variable_name}): ")
+        variables[variable_name] = user_input
     return None
 
 
 program = """
 
-espada i = 1 while(i<10){
-	DRACARYS("Menor que 10")
- i=i+1
-}endwhile
+espada i = 0
+
+input("Digite el numero para la letra i: ") (i))
+dracarys(i)
+
 """
 tokens = lexer(program)
 ast = parse_program(tokens)

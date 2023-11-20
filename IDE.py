@@ -1,11 +1,10 @@
-import customtkinter
+import customtkinter, random
+from CTkMessagebox import CTkMessagebox
+from customtkinter import CTkImage
+from PIL import Image
 from Lexer import lexer
 from Parser import parse_program
 from Interpreter import evaluate
-from customtkinter import CTkImage
-from PIL import Image
-import random
-from CTkMessagebox import CTkMessagebox
 
 customtkinter.set_appearance_mode("System")
 customtkinter.set_default_color_theme("dark-blue")
@@ -139,7 +138,7 @@ clear_icon = CTkImage(light_image=clear_image, size=(45, 45))
 
 # Crear un campo de entrada de texto desplazable más grande
 input_text = customtkinter.CTkTextbox(app, wrap=customtkinter.WORD, height=250)
-input_text.configure(font=("Consolas", 17))
+input_text.configure(font=("Consolas", 17), undo=True)
 input_text.pack(padx=10, pady=(10, 5), fill="both")
 
 options = ["IF", "FOR", "PRINT", "WHILE", "-"]

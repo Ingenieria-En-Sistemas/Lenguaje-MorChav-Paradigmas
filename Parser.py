@@ -269,110 +269,55 @@ def parse_if_statement(tokens):
 
 
 def input_statement(tokens):
-    input_statement_token = tokens.pop(0)  # Consume 'input'
+    tokens.pop(0)  # Consume 'input'
 
     # Asegúrate de que haya un paréntesis izquierdo después de 'input'
     if tokens[0].type == "LPAREN":
         tokens.pop(0)  # Consume '('
 
-        # Busca el mensaje personalizado entre comillas después del paréntesis izquierdo
-        if tokens[0].type == "STRING":
-            custom_message = tokens.pop(0).value  # Obtiene el mensaje personalizado
+        # Busca el nombre de la variable después del paréntesis izquierdo
+        if tokens[0].type == "VARIABLE":
+            variable_name = tokens.pop(0).value  # Obtiene el nombre de la variable
 
-            # Asegúrate de que haya un paréntesis derecho después del mensaje personalizado
+            # Verifica si la variable ya ha sido declarada
+            if variable_name not in variables:
+                raise NameError(
+                    f"Error: La variable '{variable_name}' no está declarada."
+                )
+
+            # Asegúrate de que haya un paréntesis derecho después del nombre de la variable
             if tokens[0].type == "RPAREN":
                 tokens.pop(0)  # Consume ')'
 
-                # Busca el paréntesis izquierdo después del mensaje personalizado
-                if tokens[0].type == "LPAREN":
-                    tokens.pop(0)  # Consume '('
+                # Crea nodos para representar la estructura deseada
+                input_node = Node("INPUT")
+                variable_assignment_node = Node("VARIABLE_ASSIGNMENT")
+                variable_node = Node("VARIABLE", value=variable_name)
+                assign_node = Node("ASSIGN")
+                user_input_node = Node("USERINPUT")
 
-                    # Busca el nombre de la variable después del paréntesis izquierdo
-                    if tokens[0].type == "VARIABLE":
-                        variable_name = tokens.pop(0).value  # Obtiene el nombre de la variable
+                # Construye la estructura del árbol
+                input_node.children = [
+                    variable_assignment_node,
+                    variable_node,
+                    assign_node,
+                    user_input_node,
+                ]
 
-                        # Verifica si la variable ya ha sido declarada
-                        if variable_name not in variables:
-                            raise NameError(
-                                f"Error: La variable '{variable_name}' no está declarada."
-                            )
-
-                        # Asegúrate de que haya un paréntesis derecho después del nombre de la variable
-                        if tokens[0].type == "RPAREN":
-                            tokens.pop(0)  # Consume ')'
-
-                            # Busca el paréntesis derecho después del nombre de la variable
-                            if tokens[0].type == "RPAREN":
-                                tokens.pop(0)  # Consume ')'
-
-                                # Pide al usuario que ingrese un valor
-                                user_input = input(
-                                    f"{custom_message} ({variable_name}): "
-                                )
-
-                                # Verifica si el tipo del valor ingresado es compatible con el tipo de la variable
-                                if check_variable_type(variable_name, user_input):
-                                    # Almacena el valor ingresado por el usuario en la variable
-                                    variables[variable_name] = user_input
-
-                                    # Crea nodos para representar la estructura deseada
-                                    input_node = Node("INPUT")
-                                    lobos_node = Node(
-                                        "MESSAGE", value=custom_message
-                                    )
-                                    variable_assignment_node = Node(
-                                        "VARIABLE_ASSIGNMENT"
-                                    )
-                                    variable_node = Node(
-                                        "VARIABLE", value=variable_name
-                                    )
-                                    assign_node = Node("ASSIGN")
-                                    user_input_node = Node(
-                                        "USERINPUT", value=user_input
-                                    )
-
-                                    # Construye la estructura del árbol
-                                    input_node.children = [
-                                        lobos_node,
-                                        variable_assignment_node,
-                                        variable_node,
-                                        assign_node,
-                                        user_input_node,
-                                    ]
-
-                                    return input_node
-                                else:
-                                    raise TypeError(
-                                        f"Error: El tipo de '{user_input}' no es compatible con la variable '{variable_name}'."
-                                    )
-                            else:
-                                raise SyntaxError(
-                                    "Error de sintaxis: Se esperaba ')' después del nombre de la variable en la declaración INPUT."
-                                )
-                        else:
-                            raise SyntaxError(
-                                "Error de sintaxis: Se esperaba ')' después del nombre de la variable en la declaración INPUT."
-                            )
-                    else:
-                        raise SyntaxError(
-                            "Error de sintaxis: Se esperaba el nombre de la variable después del paréntesis izquierdo en la declaración INPUT."
-                        )
-                else:
-                    raise SyntaxError(
-                        "Error de sintaxis: Se esperaba '(' después del nombre de la variable en la declaración INPUT."
-                    )
+                return input_node
             else:
                 raise SyntaxError(
-                    "Error de sintaxis: Se esperaba ')' después del mensaje personalizado en la declaración INPUT."
+                    "Error de sintaxis: Se esperaba ')' después del nombre de la variable en la declaración INPUT."
                 )
         else:
             raise SyntaxError(
-                "Error de sintaxis: Se esperaba un mensaje personalizado entre comillas después de '(' en la declaración INPUT."
+                "Error de sintaxis: Se esperaba el nombre de la variable después del paréntesis izquierdo en la declaración INPUT."
             )
     else:
         raise SyntaxError(
             "Error de sintaxis: Se esperaba '(' después de la declaración INPUT."
         )
+
 
 
 
@@ -587,11 +532,11 @@ entrada_ejemplo = """
 lobos i = ""
 espada a = 0
 
-input("Digite el valor ")(i))
-dracarys(i)
+dracarys("Digite el numero")
+input(i)
 
-input("Digite el numero")(a))
-dracarys(a)
+dracarys("Digite el numero")
+input(a)
 """
 
 # Llama al lexer con el ejemplo de entrada

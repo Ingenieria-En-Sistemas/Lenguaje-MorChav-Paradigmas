@@ -4,7 +4,7 @@ from customtkinter import CTkImage
 from PIL import Image
 from Lexer import lexer
 from Parser import parse_program
-from Interpreter import evaluate
+from Interpreter import evaluate,evaluate_single
 
 customtkinter.set_appearance_mode("System")
 customtkinter.set_default_color_theme("dark-blue")
@@ -18,37 +18,25 @@ def execute_expression():
 
         if ast:
             # Intérprete
-            results = evaluate(ast)
-            if results:
-                output_text.configure(state="normal")
-                output_text.delete("1.0", "end")
-
-                # Modificar la forma en que se manejan los resultados
-                for result in results:
-                    if isinstance(result, list):
-                        # Si es una lista, concaténala en una línea sin comas ni espacios
-                        result_line = "\n".join(map(str, result))
-                        output_text.insert("end", result_line + "\n")
-                    else:
-                        # Si no es una lista, imprímelo en una nueva línea
-                        output_text.insert("end", str(result) + "\n")
-
-                output_text.configure(state="disabled")
-            else:
-                output_text.configure(state="normal")
-                output_text.delete("1.0", "end")
-                output_text.insert("1.0", "Error al evaluar la expresión.\n")
-                output_text.configure(state="disabled")
+            for line_node in ast:
+                line_result = evaluate_single(line_node)
+                if line_result is not None:
+                    output_text.configure(state="normal")
+                    output_text.insert("end", str(line_result) + "\n")
+                    output_text.configure(state="disabled")
+                else:
+                    output_text.configure(state="normal")
+                    output_text.insert("end", "Error al evaluar la expresión.\n")
+                    output_text.configure(state="disabled")
         else:
             output_text.configure(state="normal")
-            output_text.delete("1.0", "end")
-            output_text.insert("1.0", "Error de sintaxis. Intente nuevamente.\n")
+            output_text.insert("end", "Error de sintaxis. Intente nuevamente.\n")
             output_text.configure(state="disabled")
     except Exception as e:
         output_text.configure(state="normal")
-        output_text.delete("1.0", "end")
-        output_text.insert("1.0", f"Error: {e}\n")
+        output_text.insert("end", f"Error: {e}\n")
         output_text.configure(state="disabled")
+
 
 
 def clear_input():

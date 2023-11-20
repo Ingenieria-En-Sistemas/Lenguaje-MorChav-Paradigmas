@@ -32,7 +32,7 @@ def evaluate_single(node):
         right = evaluate_single(node.children[1])
         return left + right
     if node.type == "USERINPUT":
-        user_input = input("input: ")
+        user_input = input("RAVEN: ")
         return user_input
     if node.type == "MINUS":
         left = evaluate_single(node.children[0])
@@ -136,11 +136,11 @@ def evaluate_single(node):
         variable_name = node.children[0].value
         variable_value = evaluate_single(node.children[2])
         variables[variable_name] = variable_value
-        #TODO: Agregarle hijos al nodo INPUT
-    if node.type == "INPUT":
+        #TODO: Agregarle hijos al nodo RAVEN
+    if node.type == "RAVEN":
         variable_name = node.children[1].value
         user_input = evaluate_single(node.children[3])
-    # Utiliza la función input_value para procesar el valor de USERINPUT
+    # Utiliza la función RAVEN_value para procesar el valor de USERINPUT
         variables[variable_name] = user_input
     return None
 
@@ -151,10 +151,10 @@ lobos i = ""
 espada a = 0
 
 dracarys("Digite el numero")
-input(i)
+RAVEN(i)
 
 dracarys("Digite el numero")
-input(a)
+RAVEN(a)
 
 dracarys(i)
 dracarys(a)

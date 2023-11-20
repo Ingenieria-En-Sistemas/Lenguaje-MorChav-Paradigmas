@@ -6,7 +6,7 @@ tokens = [
     ("PLUS", r"\+"),
     ("ENDNORTE", r"(?i)endnorte"),
     ("MINUS", r"-"),
-    ("INPUT", r"(?i)input"),
+    ("RAVEN", r"(?i)RAVEN"),
     ("TIMES", r"\*"),
     ("DIVIDE", r"/"),
     ("LPAREN", r"\("),

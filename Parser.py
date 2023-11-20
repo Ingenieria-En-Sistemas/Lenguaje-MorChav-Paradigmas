@@ -65,7 +65,7 @@ def parse_single_statement(tokens):
         return parse_while_statement(tokens)
     elif tokens[0].type == "TYPE":  # Identifica las declaraciones de variables
         return parse_variable_declaration(tokens)
-    elif tokens[0].type == "INPUT":
+    elif tokens[0].type == "RAVEN":
         return input_statement(tokens)
     return expression(tokens)
 
@@ -269,9 +269,9 @@ def parse_if_statement(tokens):
 
 
 def input_statement(tokens):
-    tokens.pop(0)  # Consume 'input'
+    tokens.pop(0)  # Consume 'RAVEN'
 
-    # Asegúrate de que haya un paréntesis izquierdo después de 'input'
+    # Asegúrate de que haya un paréntesis izquierdo después de 'RAVEN'
     if tokens[0].type == "LPAREN":
         tokens.pop(0)  # Consume '('
 
@@ -290,7 +290,7 @@ def input_statement(tokens):
                 tokens.pop(0)  # Consume ')'
 
                 # Crea nodos para representar la estructura deseada
-                input_node = Node("INPUT")
+                input_node = Node("RAVEN")
                 variable_assignment_node = Node("VARIABLE_ASSIGNMENT")
                 variable_node = Node("VARIABLE", value=variable_name)
                 assign_node = Node("ASSIGN")
@@ -307,15 +307,15 @@ def input_statement(tokens):
                 return input_node
             else:
                 raise SyntaxError(
-                    "Error de sintaxis: Se esperaba ')' después del nombre de la variable en la declaración INPUT."
+                    "Error de sintaxis: Se esperaba ')' después del nombre de la variable en la declaración RAVEN."
                 )
         else:
             raise SyntaxError(
-                "Error de sintaxis: Se esperaba el nombre de la variable después del paréntesis izquierdo en la declaración INPUT."
+                "Error de sintaxis: Se esperaba el nombre de la variable después del paréntesis izquierdo en la declaración RAVEN."
             )
     else:
         raise SyntaxError(
-            "Error de sintaxis: Se esperaba '(' después de la declaración INPUT."
+            "Error de sintaxis: Se esperaba '(' después de la declaración RAVEN."
         )
 
 
@@ -533,10 +533,10 @@ lobos i = ""
 espada a = 0
 
 dracarys("Digite el numero")
-input(i)
+RAVEN(i)
 
 dracarys("Digite el numero")
-input(a)
+RAVEN(a)
 """
 
 # Llama al lexer con el ejemplo de entrada

@@ -65,6 +65,8 @@ def parse_single_statement(tokens):
         return parse_while_statement(tokens)
     elif tokens[0].type == "TYPE":  # Identifica las declaraciones de variables
         return parse_variable_declaration(tokens)
+    elif tokens[0].type == "INPUT":
+        return input_statement(tokens)
     return expression(tokens)
 
 
@@ -173,7 +175,6 @@ def parse_variable_reference(tokens):
         raise NameError(f"La variable '{variable_name}' no está definida.")
 
 
-
 def parse_for_statement(tokens):
     tokens.pop(0)  # Consume 'VIAJE'
     if tokens[0].type == "LPAREN":
@@ -265,6 +266,139 @@ def parse_if_statement(tokens):
     raise SyntaxError(
         "Error de sintaxis: Se esperaba 'ENDNORTE' al final de la declaración condicional."
     )
+
+
+def input_statement(tokens):
+    input_statement_token = tokens.pop(0)  # Consume 'input'
+
+    # Asegúrate de que haya un paréntesis izquierdo después de 'input'
+    if tokens[0].type == "LPAREN":
+        tokens.pop(0)  # Consume '('
+
+        # Busca el mensaje personalizado entre comillas después del paréntesis izquierdo
+        if tokens[0].type == "STRING":
+            custom_message = tokens.pop(0).value  # Obtiene el mensaje personalizado
+
+            # Asegúrate de que haya un paréntesis derecho después del mensaje personalizado
+            if tokens[0].type == "RPAREN":
+                tokens.pop(0)  # Consume ')'
+
+                # Busca el paréntesis izquierdo después del mensaje personalizado
+                if tokens[0].type == "LPAREN":
+                    tokens.pop(0)  # Consume '('
+
+                    # Busca el nombre de la variable después del paréntesis izquierdo
+                    if tokens[0].type == "VARIABLE":
+                        variable_name = tokens.pop(0).value  # Obtiene el nombre de la variable
+
+                        # Verifica si la variable ya ha sido declarada
+                        if variable_name not in variables:
+                            raise NameError(
+                                f"Error: La variable '{variable_name}' no está declarada."
+                            )
+
+                        # Asegúrate de que haya un paréntesis derecho después del nombre de la variable
+                        if tokens[0].type == "RPAREN":
+                            tokens.pop(0)  # Consume ')'
+
+                            # Busca el paréntesis derecho después del nombre de la variable
+                            if tokens[0].type == "RPAREN":
+                                tokens.pop(0)  # Consume ')'
+
+                                # Pide al usuario que ingrese un valor
+                                user_input = input(
+                                    f"{custom_message} ({variable_name}): "
+                                )
+
+                                # Verifica si el tipo del valor ingresado es compatible con el tipo de la variable
+                                if check_variable_type(variable_name, user_input):
+                                    # Almacena el valor ingresado por el usuario en la variable
+                                    variables[variable_name] = user_input
+
+                                    # Crea nodos para representar la estructura deseada
+                                    input_node = Node("INPUT")
+                                    lobos_node = Node(
+                                        "MESSAGE", value=custom_message
+                                    )
+                                    variable_assignment_node = Node(
+                                        "VARIABLE_ASSIGNMENT"
+                                    )
+                                    variable_node = Node(
+                                        "VARIABLE", value=variable_name
+                                    )
+                                    assign_node = Node("ASSIGN")
+                                    user_input_node = Node(
+                                        "USERINPUT", value=user_input
+                                    )
+
+                                    # Construye la estructura del árbol
+                                    input_node.children = [
+                                        lobos_node,
+                                        variable_assignment_node,
+                                        variable_node,
+                                        assign_node,
+                                        user_input_node,
+                                    ]
+
+                                    return input_node
+                                else:
+                                    raise TypeError(
+                                        f"Error: El tipo de '{user_input}' no es compatible con la variable '{variable_name}'."
+                                    )
+                            else:
+                                raise SyntaxError(
+                                    "Error de sintaxis: Se esperaba ')' después del nombre de la variable en la declaración INPUT."
+                                )
+                        else:
+                            raise SyntaxError(
+                                "Error de sintaxis: Se esperaba ')' después del nombre de la variable en la declaración INPUT."
+                            )
+                    else:
+                        raise SyntaxError(
+                            "Error de sintaxis: Se esperaba el nombre de la variable después del paréntesis izquierdo en la declaración INPUT."
+                        )
+                else:
+                    raise SyntaxError(
+                        "Error de sintaxis: Se esperaba '(' después del nombre de la variable en la declaración INPUT."
+                    )
+            else:
+                raise SyntaxError(
+                    "Error de sintaxis: Se esperaba ')' después del mensaje personalizado en la declaración INPUT."
+                )
+        else:
+            raise SyntaxError(
+                "Error de sintaxis: Se esperaba un mensaje personalizado entre comillas después de '(' en la declaración INPUT."
+            )
+    else:
+        raise SyntaxError(
+            "Error de sintaxis: Se esperaba '(' después de la declaración INPUT."
+        )
+
+
+
+
+def check_variable_type(variable_name, user_input):
+    # Verifica si la variable ya ha sido declarada
+    if variable_name in variables:
+        # Obtiene el tipo de la variable
+        variable_type = variables[variable_name].type
+
+        # Verifica si el tipo del valor ingresado es compatible con la variable
+        if (
+            (variable_type == "LOBOS" and not user_input.isdigit())
+            or (variable_type == "NUMBER" and user_input.isdigit())
+            or (variable_type == "bool" and user_input.lower() in ("true", "false"))
+        ):
+            # Si llegamos aquí, el tipo es correcto
+            return True
+
+    # Si no es compatible, genera un error
+    raise TypeError(
+        f"Error: El tipo de '{user_input}' no es compatible con la variable '{variable_name}'."
+    )
+
+
+
 
 
 def parse_else_statement(tokens):
@@ -450,10 +584,14 @@ def print_ast(node, level=0):
 # Ejemplo de entrada con un bucle FOR
 entrada_ejemplo = """ 
 
-espada i = 1
-i = 3
+lobos i = ""
+espada a = 0
+
+input("Digite el valor ")(i))
 dracarys(i)
 
+input("Digite el numero")(a))
+dracarys(a)
 """
 
 # Llama al lexer con el ejemplo de entrada

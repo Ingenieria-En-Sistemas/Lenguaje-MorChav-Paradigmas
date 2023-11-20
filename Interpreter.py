@@ -31,6 +31,8 @@ def evaluate_single(node):
         left = evaluate_single(node.children[0])
         right = evaluate_single(node.children[1])
         return left + right
+    if node.type == "USERINPUT":
+        return node.value
     if node.type == "MINUS":
         left = evaluate_single(node.children[0])
         right = evaluate_single(node.children[1])
@@ -133,15 +135,26 @@ def evaluate_single(node):
         variable_name = node.children[0].value
         variable_value = evaluate_single(node.children[2])
         variables[variable_name] = variable_value
+        #TODO: Agregarle hijos al nodo INPUT
+    if node.type == "INPUT":
+        variable_name = node.children[2].value
+        user_input = node.children[4].value
+    # Utiliza la función input_value para procesar el valor de USERINPUT
+        variables[variable_name] = user_input
     return None
 
 
 program = """
 
-espada i = 1 CAMINO(i<10){
-	DRACARYS("Menor que 10")
- i=i+1
-}endCAMINO
+lobos i = ""
+espada a = 0
+
+input("Digite el valor ")(i))
+dracarys(i)
+
+input("Digite el numero")(a))
+dracarys(a)
+
 """
 tokens = lexer(program)
 ast = parse_program(tokens)

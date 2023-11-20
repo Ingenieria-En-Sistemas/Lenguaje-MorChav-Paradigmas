@@ -24,10 +24,7 @@ def execute_expression():
                     output_text.configure(state="normal")
                     output_text.insert("end", str(line_result) + "\n")
                     output_text.configure(state="disabled")
-                else:
-                    output_text.configure(state="normal")
-                    output_text.insert("end", "Error al evaluar la expresión.\n")
-                    output_text.configure(state="disabled")
+
         else:
             output_text.configure(state="normal")
             output_text.insert("end", "Error de sintaxis. Intente nuevamente.\n")

@@ -192,6 +192,50 @@ output_text = customtkinter.CTkTextbox(
 output_text.configure(font=("Consolas", 17))
 output_text.pack(padx=10, pady=(5, 10), fill="both")
 
+def compile_program():
+    input_expr = input_text.get("1.0", "end-1c")
+    try:
+        tokens = lexer(input_expr)
+        ast = parse_program(tokens)
+
+        if ast:
+            message = "Compilación correcta"
+        else:
+            message = "Error de sintaxis. Compilación fallida."
+
+        # Muestra el mensaje en una ventana emergente
+        msg_box = CTkMessagebox(
+            title="Resultado de la Compilación",
+            font=("Consolas", 17),
+            message=message,
+            icon="Icons/run.png" if ast else "",
+            option_1="Aceptar",
+            justify="center",
+        )
+        msg_box.get()
+
+    except Exception as e:
+        # Muestra un mensaje de error en una ventana emergente
+        msg_box = CTkMessagebox(
+            title="Error",
+            font=("Consolas", 17),
+            message=f"Error: {e}",
+            icon="error",
+            option_1="Aceptar",
+            justify="center",
+        )
+        msg_box.get()
+compile_button = customtkinter.CTkButton(
+    button_container,
+    text="Compilar",
+    image=clear_icon,
+    compound="left",
+    command=compile_program,
+    fg_color="orange",
+    text_color="black",
+)
+compile_button.configure(font=("Consolas", 17))
+compile_button.pack(side="left", padx=10)
 # Carga y cambia el título de la ventana al iniciar
 change_window_title()
 

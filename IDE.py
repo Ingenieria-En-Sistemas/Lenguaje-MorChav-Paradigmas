@@ -17,7 +17,6 @@ def execute_expression():
         ast = parse_program(tokens)
 
         if ast:
-            # Intérprete
             for line_node in ast:
                 line_result = evaluate_single(line_node)
                 if line_result is not None:
@@ -64,16 +63,16 @@ def add_selected_option_to_input_text():
             "end",
             """ 
 espada i = 1
-while(i<10){
+camino(i<10){
     DRACARYS("Menor que 10")
     i=i+1
-}endwhile""",
+}endcamino""",
         )
     elif selected_option == "BOOLEAN":
         input_text.insert(
             "end",
 """
-bool a = false
+lealtad a = false
 
 NORTE(2==2){
 a = true
@@ -84,8 +83,6 @@ a = true
 """,
         )
 
-
-# Lista de títulos aleatorios
 random_titles = [
     "El odio es bueno si nos hace seguir adelante. (Sandor ‘El Perro’ Clegane)",
     "Cuando se juega al Juego de Tronos, solo se puede ganar o morir. (Cersei Lannister)",
@@ -95,14 +92,12 @@ random_titles = [
 ]
 
 
-# Función para cambiar el título de la ventana
 def change_window_title():
     new_title = random.choice(random_titles)
     app.title(new_title)
 
 
 def exit_action():
-    # Use CTkMessagebox for the exit confirmation
     msg = CTkMessagebox(
         title="Salir",
         font=("Consolas", 17),
@@ -118,12 +113,10 @@ def exit_action():
         app.destroy()
 
 
-# Configurar la ventana principal
 app = customtkinter.CTk()
 app.geometry("800x600")
 app.iconbitmap("Icons/drake.ico")
 
-# Crear un contenedor para los botones y centrarlos
 button_container = customtkinter.CTkFrame(app)
 button_container.pack()
 
@@ -131,7 +124,6 @@ option_container = customtkinter.CTkFrame(app)
 option_container.pack(side="top", pady=10)
 
 
-# Cargar las imágenes como CTkImage y ajustar el tamaño
 run_image = Image.open("Icons/run.png")
 run_icon = CTkImage(light_image=run_image, size=(35, 20))
 
@@ -145,7 +137,6 @@ clear_image = Image.open("Icons/clear.png")
 clear_icon = CTkImage(light_image=clear_image, size=(45, 45))
 
 
-# Crear un campo de entrada de texto desplazable más grande
 input_text = customtkinter.CTkTextbox(app, wrap=customtkinter.WORD, height=250)
 input_text.configure(font=("Consolas", 17), undo=True)
 input_text.pack(padx=10, pady=(10, 5), fill="both")
@@ -171,7 +162,6 @@ add_selected_option_button = customtkinter.CTkButton(
 add_selected_option_button.configure(font=("Consolas", 17))
 add_selected_option_button.pack(side="left", padx=20)
 
-# Crear botones adicionales "Nuevo", "Opciones" y "Salir"
 new_button = customtkinter.CTkButton(
     button_container,
     text="Nuevo",
@@ -184,7 +174,6 @@ new_button = customtkinter.CTkButton(
 new_button.configure(font=("Consolas", 17))
 new_button.pack(side="left", padx=10)
 
-# Crear el botón para ejecutar la expresión con el icono
 execute_button = customtkinter.CTkButton(
     button_container,
     text="Ejecutar",
@@ -198,19 +187,7 @@ execute_button.configure(font=("Consolas", 17))
 execute_button.pack(side="left", padx=10)
 
 
-exit_button = customtkinter.CTkButton(
-    button_container,
-    text="Salir",
-    image=exit_icon,
-    compound="left",
-    command=exit_action,
-    fg_color="#ec5353",
-    text_color="black",
-)
-exit_button.configure(font=("Consolas", 17))
-exit_button.pack(side="left", padx=10)
 
-# Crear un campo de salida de texto desplazable más grande
 output_text = customtkinter.CTkTextbox(
     app, state="disabled", wrap=customtkinter.WORD, height=200
 )
@@ -228,7 +205,6 @@ def compile_program():
         else:
             message = "Error de sintaxis. Compilación fallida."
 
-        # Muestra el mensaje en una ventana emergente
         msg_box = CTkMessagebox(
             title="Resultado de la Compilación",
             font=("Consolas", 17),
@@ -240,7 +216,6 @@ def compile_program():
         msg_box.get()
 
     except Exception as e:
-        # Muestra un mensaje de error en una ventana emergente
         msg_box = CTkMessagebox(
             title="Error",
             font=("Consolas", 17),
@@ -261,8 +236,19 @@ compile_button = customtkinter.CTkButton(
 )
 compile_button.configure(font=("Consolas", 17))
 compile_button.pack(side="left", padx=10)
-# Carga y cambia el título de la ventana al iniciar
+exit_button = customtkinter.CTkButton(
+    button_container,
+    text="Salir",
+    image=exit_icon,
+    compound="left",
+    command=exit_action,
+    fg_color="#ec5353",
+    text_color="black",
+)
+exit_button.configure(font=("Consolas", 17))
+exit_button.pack(side="left", padx=10)
+
+
 change_window_title()
 
-# Ejecutar la aplicación
 app.mainloop()

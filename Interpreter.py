@@ -1,17 +1,17 @@
 from Lexer import lexer
 from Parser import parse_program
 
-# Diccionario para rastrear las variables y sus valores
+
 variables = {}
 
 
 
 def evaluate(nodes):
-    all_results = []  # Almacena todos los resultados de la ejecución
+    all_results = []
     for node in nodes:
         result = evaluate_single(node)
         if result is not None:
-            all_results.append(result)  # Extiende la lista de resultados
+            all_results.append(result)
 
     return all_results
 
@@ -22,17 +22,17 @@ def evaluate_single(node):
         for child in node:
             result = evaluate_single(child)
             if result is not None:
-                results.append(result)  # Extiende la lista de resultados
+                results.append(result)
         return results
 
     if node.type == "NUMBER":
-        return node.value  # Devuelve directamente el valor numérico
+        return node.value
     if node.type == "PLUS":
         left = evaluate_single(node.children[0])
         right = evaluate_single(node.children[1])
         return left + right
     if node.type == "BOOLEAN":
-        return node.value  # Devuelve directamente el valor booleano
+        return node.value
     if node.type == "NOT":
         operand = evaluate_single(node.children[0])
         return not operand
@@ -45,9 +45,9 @@ def evaluate_single(node):
         right = evaluate_single(node.children[1])
         return left or right
     if node.type == "CHAR":
-        return node.value  # Devuelve directamente el valor de caracter
+        return node.value
     if node.type == "FLOAT":
-        return node.value  # Devuelve directamente el valor de punto flotante
+        return node.value
     if node.type == "USERINPUT":
         user_input = input("RAVEN: ")
         return user_input
@@ -83,40 +83,37 @@ def evaluate_single(node):
         condition = node.children[0]
         body = node.children[1]
 
-        # Lista para almacenar los resultados de las iteraciones
         results = []
 
         while evaluate_single(condition):
             result = evaluate_single(body)
             results.extend(result)
 
-        return results  # Devolver la lista de resultados de las iteraciones
+        return results
 
     if node.type == "VIAJE":
         variable_name = node.children[0].children[1].value
         initial_value = (
             node.children[0].children[2].value
-        )  # El valor inicial es un nodo
+        )
         final_value = node.children[1].value
         step = node.children[2].value
-        body = node.children[3]  # El cuerpo del bucle
+        body = node.children[3]
 
-        # Lista para almacenar los resultados de las iteraciones
         results = []
 
         for i in range(initial_value, final_value + 1, step):
-            # Agregar la variable de control al diccionario de variables
             variables[variable_name] = i
             result = evaluate_single(body)
-            results.append(result)  # Agrega el resultado de la iteración actual
+            results.append(result)
 
-        return results  # Devolver la lista de resultados de las iteraciones
+        return results
 
     elif node.type == "DRACARYS":
         if node.children:
             dracarys_content = evaluate_single(node.children[0])
             return dracarys_content
-        elif node.value:  # Manejar el caso donde DRACARYS es una variable
+        elif node.value:
             return evaluate_single(node.value)
     if node.type == "LOBOS":
         string_content = node.value
@@ -124,9 +121,7 @@ def evaluate_single(node):
             string_content[0] == string_content[-1]
             and (string_content[0] == '"' or string_content[0] == "'")
         ):
-            return [
-                string_content[1:-1]
-            ]  # Devuelve el contenido de la cadena sin comillas como una lista
+            return [string_content[1:-1]]
         else:
             return [string_content]
     if node.type == "NORTE":
@@ -136,7 +131,6 @@ def evaluate_single(node):
         elif len(node.children) == 3:
             return evaluate_single(node.children[2])
     if node.type == "VARIABLE_DECLARATION":
-        # Si es una declaración de variable, almacena el valor en el diccionario
         if (
             len(node.children) == 4
             and node.children[0].type == "TYPE"
@@ -153,17 +147,15 @@ def evaluate_single(node):
         variable_name = node.children[0].value
         variable_value = evaluate_single(node.children[2])
         variables[variable_name] = variable_value
-        #TODO: Agregarle hijos al nodo RAVEN
     if node.type == "RAVEN":
         variable_name = node.children[1].value
         user_input = evaluate_single(node.children[3])
-    # Utiliza la función RAVEN_value para procesar el valor de USERINPUT
         variables[variable_name] = user_input
     return None
 
 
 program = """
-bool a = false
+lealtad a = false
 
 NORTE(2==2){
 a = true
@@ -176,7 +168,6 @@ a = true
 tokens = lexer(program)
 ast = parse_program(tokens)
 
-# Ahora, ejecuta el intérprete línea por línea y muestra el resultado
 for line_node in ast:
     line_result = evaluate_single(line_node)
     if line_result is not None:

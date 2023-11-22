@@ -5,11 +5,12 @@ from Lexer import lexer
 # Nodos para operadores lógicos
 
 
-
 # Clase Node para construir el árbol de sintaxis abstracta (AST)
 class Node:
     LOGICAL_OPERATORS = {"AND", "OR", "NOT"}
+
     def __init__(self, type, children=None, value=None):
+        self.FUNC_TYPES = {"FUNC_CALL", "FUNC_DECL", "FUNC_PARAMS", "FUNC_BODY"}
         self.type = type
         if children:
             self.children = children
@@ -45,6 +46,9 @@ def parse_program(tokens):
             # Si el token actual es una expresión condicional (if), procesarlo como tal
             if_statement = parse_if_statement(tokens)
             statements.append(if_statement)
+        elif tokens[0].type == "VOID":
+            function_declaration = parse_function_declaration(tokens)
+            statements.append(function_declaration)
         else:
             # De lo contrario, procesar la sentencia como una expresión
             statement = parse_single_statement(tokens)
@@ -52,7 +56,6 @@ def parse_program(tokens):
     return statements
 
 
-# Función para el símbolo no terminal "sentencia"
 def parse_single_statement(tokens):
     if tokens[0].type == "NORTE":
         return parse_if_statement(tokens)
@@ -68,11 +71,47 @@ def parse_single_statement(tokens):
         return parse_for_statement(tokens)
     if tokens[0].type == "WHILE":
         return parse_while_statement(tokens)
-    elif tokens[0].type == "TYPE":  # Identifica las declaraciones de variables
+    elif tokens[0].type == "TYPE":
         return parse_variable_declaration(tokens)
     elif tokens[0].type == "RAVEN":
         return input_statement(tokens)
+    if tokens[0].type == "VOID":
+        tokens.pop(0)  # Consume 'VOID'
+        function_name = tokens.pop(0).value  # Nombre de la función
+    # Pass function_name to parse_function_call
+        return parse_function_call(tokens, function_name)
     return expression(tokens)
+
+def parse_function_call(tokens, function_name=None):
+    if not function_name:
+        if tokens[0].type == "VOID":
+            tokens.pop(0)  # Consume 'VOID'
+            function_name = tokens.pop(0).value  # Nombre de la función
+
+            # Check if the next token is 'LPAREN'
+            if tokens[0].type == "LPAREN":
+                tokens.pop(0)  # Consume '('
+                args = parse_function_arguments(tokens)
+                if tokens[0].type == "RPAREN":
+                    tokens.pop(0)  # Consume ')'
+                    return Node("FUNC_CALL", [Node("FUNCTION", value=function_name), args])
+                else:
+                    raise SyntaxError(
+                        "Error de sintaxis: Se esperaba ')' después de los argumentos de la función."
+                    )
+                return Node("FUNC_CALL", [Node("FUNCTION", value=function_name)])
+    else:
+        # It's a function reference, not a call
+        return Node("VARIABLE", value=function_name)
+
+
+    raise SyntaxError(
+        "Error de sintaxis: Se esperaba 'VOID' al inicio de la llamada de la función."
+    )
+
+
+
+
 
 
 # Función para el símbolo no terminal "sentencia_while"
@@ -99,6 +138,22 @@ def parse_while_statement(tokens):
         raise SyntaxError(
             "Error de sintaxis: Se esperaba '{' al comienzo del cuerpo del bucle WHILE."
         )
+
+
+def parse_function_arguments(tokens):
+    args = []
+    while tokens[0].type != "RPAREN":
+        arg = expression(tokens)
+        args.append(arg)
+
+        if tokens[0].type == "COMMA":
+            tokens.pop(0)  # Consume the comma
+        elif tokens[0].type != "RPAREN":
+            raise SyntaxError(
+                "Error de sintaxis: Se esperaba ',' o ')' después de los argumentos de la función."
+            )
+    return args
+
 
 
 def parse_boolean(tokens):
@@ -180,63 +235,74 @@ def parse_list_declaration(var_type, variable_name, tokens):
     )
 
 
+def parse_function_declaration(tokens):
+    tokens.pop(0)  # Consume 'VOID'
+    return_type = tokens.pop(0).value  # Tipo de retorno de la función
+    function_name = tokens.pop(0).value  # Nombre de la función
 
-"""
-def parse_variable_declaration(tokens):
-    var_type = tokens.pop(0).value  # Tipo de variable (espada, string, etc.)
-    variable_name = tokens.pop(0).value  # Nombre de la variable
+    if tokens[0].type == "LPAREN":
+        tokens.pop(0)  # Consume '('
+        params = parse_function_parameters(tokens)
 
-    if tokens[0].type == "ASSIGN":
-        tokens.pop(0)  # Consume '='
+        if tokens[0].type == "RPAREN":
+            tokens.pop(0)  # Consume ')'
 
-        # Verifica si la inicialización es una lista
-        if tokens[0].type == "LBRACE":
-            tokens.pop(0)  # Consume '{'
+            if tokens[0].type == "LBRACE":
+                tokens.pop(0)  # Consume '{'
+                body = parse_function_body(tokens)
 
-            # Parsea la lista de enteros
-            list_values = []
-            while tokens[0].type != "RBRACE":
-                if tokens[0].type == "NUMBER":
-                    list_values.append(int(tokens.pop(0).value))
-                elif tokens[0].type == "COMMA":
-                    tokens.pop(0)  # Consume ','
-                else:
-                    raise SyntaxError("Error de sintaxis: Lista mal formada.")
+                # Cambia el tipo de nodo de FUNC_DECL a FUNC_DECLARATION
+                return Node(
+                    "FUNC_DECLARATION",
+                    [Node("FUNCTION", children=[Node("TYPE", value=return_type), Node("VARIABLE", value=function_name)],), params, body],
 
-            # Consume '}'
-            tokens.pop(0)
-
-            # Asigna la lista a la variable
-            variables[variable_name] = Node("LIST", value=list_values)
-
-            return Node(
-                "VARIABLE_DECLARATION",
-                children=[
-                    Node("TYPE", value=var_type),
-                    Node("VARIABLE", value=variable_name),
-                    Node("ASSIGN"),
-                    Node("LIST", value=list_values),
-                ],
-            )
+                )
+            else:
+                raise SyntaxError(
+                    "Error de sintaxis: Se esperaba '{' después de ')' en la declaración de la función."
+                )
         else:
-            # Si no es una lista, parsea la expresión normalmente
-            value = expression(tokens)
-            variables[variable_name] = value
-
-            return Node(
-                "VARIABLE_DECLARATION",
-                children=[
-                    Node("TYPE", value=var_type),
-                    Node("VARIABLE", value=variable_name),
-                    Node("ASSIGN"),
-                    value,
-                ],
+            raise SyntaxError(
+                "Error de sintaxis: Se esperaba ')' después de los parámetros de la función."
             )
     else:
         raise SyntaxError(
-            "Error de sintaxis: Se esperaba '=' después del nombre de la variable."
+            "Error de sintaxis: Se esperaba '(' después del nombre de la función."
         )
-"""
+
+
+
+def parse_function_parameters(tokens):
+    params = []
+    while tokens[0].type != "RPAREN":
+        if tokens[0].type == "TYPE":
+            var_type = tokens.pop(0).value  # Tipo de variable
+            var_name = tokens.pop(0).value  # Nombre de la variable
+            params.append(
+                Node(
+                    "FUNC_PARAMS",
+                    [Node("TYPE", value=var_type), Node("VARIABLE", value=var_name)],
+                )
+            )
+
+            if tokens[0].type == "COMMA":
+                tokens.pop(0)  # Consume la coma
+            elif tokens[0].type != "RPAREN":
+                raise SyntaxError(
+                    "Error de sintaxis: Se esperaba ',' o ')' después de los parámetros de la función."
+                )
+        else:
+            raise SyntaxError(
+                "Error de sintaxis: Se esperaba el tipo de variable en la declaración de parámetros de la función."
+            )
+    return params
+
+
+def parse_function_body(tokens):
+    # No se espera un LBRACE aquí, ya que el cuerpo de la función comienza directamente con las declaraciones
+    body_statements = parse_block(tokens)
+    return Node("FUNC_BODY", body_statements)
+
 
 
 def parse_variable_assignment(tokens):
@@ -259,13 +325,17 @@ def parse_variable_assignment(tokens):
         )
 
 
-# Función para analizar una referencia a una variable
 def parse_variable_reference(tokens):
     variable_name = tokens.pop(0).value
-    if variable_name in variables:
+    if tokens and tokens[0].type == "LPAREN":
+        # Es una llamada a función
+        return parse_function_call(tokens, variable_name)
+    elif variable_name in variables:
+        # Es una variable
         return variables[variable_name]
     else:
         raise NameError(f"La variable '{variable_name}' no está definida.")
+
 
 
 def parse_for_statement(tokens):
@@ -439,9 +509,26 @@ def parse_else_statement(tokens):
     return Node("SUR", [else_statement])
 
 
-# Actualiza la función expression para incluir operadores lógicos
 def expression(tokens):
     left = logical_or(tokens)
+    while tokens and tokens[0].type in ("VOID", "VARIABLE"):
+        if tokens[0].type == "VOID":
+            function_name = tokens.pop(0).value  # Function name
+            # Check if the next token is 'LPAREN'
+            if tokens[0].type == "LPAREN":
+                tokens.pop(0)  # Consume '('
+                args = parse_function_arguments(tokens)
+                if tokens[0].type == "RPAREN":
+                    tokens.pop(0)  # Consume ')'
+                    left = Node("FUNC_CALL", [Node("FUNCTION", value=function_name), args])
+                else:
+                    raise SyntaxError("Syntax error: Expected ')' after function arguments.")
+            else:
+                raise SyntaxError("Syntax error: Expected '(' after function name.")
+        elif tokens[0].type == "VARIABLE":
+            left = parse_variable_reference(tokens)
+        else:
+            left = factor(tokens)
     return left
 
 def logical_or(tokens):
@@ -452,6 +539,8 @@ def logical_or(tokens):
         left = Node(op.type, [left, right])
     return left
 
+
+
 def logical_and(tokens):
     left = equality(tokens)
     while tokens and tokens[0].type == "AND":
@@ -459,6 +548,7 @@ def logical_and(tokens):
         right = equality(tokens)
         left = Node(op.type, [left, right])
     return left
+
 
 # Función para el símbolo no terminal "igualdad"
 def equality(tokens):
@@ -508,7 +598,6 @@ def multiplication(tokens):
     return left
 
 
-# Función para el símbolo no terminal "factor"
 def factor(tokens):
     if tokens[0].type == "NUMBER":
         return Node("NUMBER", value=int(tokens.pop(0).value))
@@ -538,6 +627,7 @@ def factor(tokens):
             expr = expression(tokens)
             if tokens[0].type == "RPAREN":
                 tokens.pop(0)  # Consume el paréntesis derecho
+                return expr  # Termina la expresión cuando se encuentra un RPAREN
             return expr
     elif tokens[0].type == "DRACARYS":
         return parse_dracarys(tokens)
@@ -550,9 +640,15 @@ def factor(tokens):
             return parse_list(tokens)
         else:
             return Node("VARIABLE", value=tokens.pop(0).value)
+    elif tokens[0].type == "COMMA":
+        tokens.pop(0)  # Consume el COMMA
+        return factor(tokens)
     raise SyntaxError(
         f"Error de sintaxis: Token inesperado '{tokens[0].type}' en factor."
     )
+
+
+
 
 # Nueva función para parsear listas
 def parse_list(tokens):
@@ -594,35 +690,15 @@ def parse_dracarys(tokens):
     tokens.pop(0)  # Consume 'DRACARYS'
     if tokens[0].type == "LPAREN":
         tokens.pop(0)  # Consume '('
-        expression_node = expression(tokens)
-        
-        # Check if there is an index access
-        if tokens[0].type == "LBRACKET":
-            tokens.pop(0)  # Consume '['
-            index_node = expression(tokens)
-            if tokens[0].type == "RBRACKET":
-                tokens.pop(0)  # Consume ']'
-                if tokens[0].type == "RPAREN":
-                    tokens.pop(0)  # Consume ')'
-                    result_node = Node("DRACARYS", children=[expression_node, index_node])
-                    return result_node
-                else:
-                    raise SyntaxError(
-                        "Error de sintaxis: Se esperaba ')' después del índice."
-                    )
-            else:
-                raise SyntaxError(
-                    "Error de sintaxis: Se esperaba ']' después del índice."
-                )
-        
-        # No index access, continue as before
+        arguments = parse_function_arguments(tokens)
+
         if tokens[0].type == "RPAREN":
             tokens.pop(0)  # Consume ')'
-            result_node = Node("DRACARYS", children=[expression_node])
+            result_node = Node("DRACARYS", children=arguments)
             return result_node
         else:
             raise SyntaxError(
-                "Error de sintaxis: Se esperaba ')' después de la expresión."
+                "Error de sintaxis: Se esperaba ')' después de los argumentos de DRACARYS."
             )
     elif tokens[0].type in ("STRING", "VARIABLE", "NUMBER"):
         value_node = tokens.pop(0).value
@@ -631,6 +707,7 @@ def parse_dracarys(tokens):
         raise SyntaxError(
             "Error de sintaxis: Se esperaba '(' o una cadena después de 'DRACARYS'."
         )
+
 
 
 # Función para el símbolo no terminal "bloque"
@@ -682,8 +759,14 @@ def print_ast(node, level=0):
 entrada_ejemplo = """ 
 
 
-list a = {1, 2, 3, 4, 5}
-dracarys(a[1])
+void espada sumar(espada x, espada y) {
+    dracarys(x + y)
+}
+
+espada a = 5
+espada b = 10
+
+sumar (a, b)
 
 """
 

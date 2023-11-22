@@ -7,6 +7,8 @@ tokens = [
     ("ENDNORTE", r"(?i)endnorte"),
     ("MINUS", r"-"),
     ("RAVEN", r"(?i)RAVEN"),
+    ("VOID", r"(?i)void"),
+    ("ENDVOID", r"(?i)endvoid"),
     ("TIMES", r"\*"),
     ("NOT", r"(?i)not"),
     ("AND", r"(?i)and"),

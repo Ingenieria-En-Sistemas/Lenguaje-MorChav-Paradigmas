@@ -23,6 +23,8 @@ def evaluate_single(node):
             if result is not None:
                 results.append(result)
         return results
+    
+    
 
     if node.type == "NUMBER":
         return node.value
@@ -154,6 +156,20 @@ def evaluate_single(node):
         variable_name = node.children[0].value
         variable_value = evaluate_single(node.children[2])
         variables[variable_name] = variable_value
+    
+    if node.type == "FUNC_DECLARATION":
+        function_name = node.children[0].value
+        function_params = [param.value for param in node.children[1:]]
+        function_body = node.children[-1]
+
+        # Crear una función lambda que representa la función declarada
+        variables[function_name] = lambda *args: evaluate_single_function(function_body, function_params, args)
+        return None
+    if node.type == "FUNC_CALL":
+        function_name = node.children[0].value
+        args = [evaluate_single(arg) for arg in node.children[1:]]
+        if function_name in variables and callable(variables[function_name]):
+            return variables[function_name](*args)
     if node.type == "RAVEN":
         variable_name = node.children[1].value
         user_input = evaluate_single(node.children[3])
@@ -176,11 +192,36 @@ def evaluate_single(node):
                 variables[variable_name] = variable_value
     return None
 
+def evaluate_single_function(body, params, args):
+    # Crear un diccionario para mapear parámetros con sus valores
+    param_dict = {params[i]: args[i] for i in range(len(params))}
+
+    # Asignar los valores de los parámetros en el contexto de la función
+    for key, value in param_dict.items():
+        variables[key] = value
+
+    # Evaluar el cuerpo de la función
+    result = None
+    for statement in body:
+        result = evaluate_single(statement)
+
+    # Limpiar el contexto de los parámetros después de la llamada a la función
+    for key in param_dict.keys():
+        del variables[key]
+
+    return result
+
 
 program = """
 
-list a = {1, 2, 3, 4, 5}
-dracarys(a[2])
+void espada sumar(espada x, espada y) {
+    dracarys(x + y)
+}
+
+espada a = 5
+espada b = 10
+
+sumar (a, b)
 
 """
 tokens = lexer(program)

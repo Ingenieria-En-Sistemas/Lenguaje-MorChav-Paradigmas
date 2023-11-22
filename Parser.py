@@ -166,7 +166,62 @@ def parse_variable_declaration(tokens):
         raise SyntaxError(
             "Error de sintaxis: Se esperaba '=' después del nombre de la variable."
         )
+"""
+def parse_variable_declaration(tokens):
+    var_type = tokens.pop(0).value  # Tipo de variable (espada, string, etc.)
+    variable_name = tokens.pop(0).value  # Nombre de la variable
 
+    if tokens[0].type == "ASSIGN":
+        tokens.pop(0)  # Consume '='
+
+        # Verifica si la inicialización es una lista
+        if tokens[0].type == "LBRACE":
+            tokens.pop(0)  # Consume '{'
+
+            # Parsea la lista de enteros
+            list_values = []
+            while tokens[0].type != "RBRACE":
+                if tokens[0].type == "NUMBER":
+                    list_values.append(int(tokens.pop(0).value))
+                elif tokens[0].type == "COMMA":
+                    tokens.pop(0)  # Consume ','
+                else:
+                    raise SyntaxError("Error de sintaxis: Lista mal formada.")
+
+            # Consume '}'
+            tokens.pop(0)
+
+            # Asigna la lista a la variable
+            variables[variable_name] = Node("LIST", value=list_values)
+
+            return Node(
+                "VARIABLE_DECLARATION",
+                children=[
+                    Node("TYPE", value=var_type),
+                    Node("VARIABLE", value=variable_name),
+                    Node("ASSIGN"),
+                    Node("LIST", value=list_values),
+                ],
+            )
+        else:
+            # Si no es una lista, parsea la expresión normalmente
+            value = expression(tokens)
+            variables[variable_name] = value
+
+            return Node(
+                "VARIABLE_DECLARATION",
+                children=[
+                    Node("TYPE", value=var_type),
+                    Node("VARIABLE", value=variable_name),
+                    Node("ASSIGN"),
+                    value,
+                ],
+            )
+    else:
+        raise SyntaxError(
+            "Error de sintaxis: Se esperaba '=' después del nombre de la variable."
+        )
+"""
 
 
 def parse_variable_assignment(tokens):
@@ -552,14 +607,7 @@ def print_ast(node, level=0):
 # Ejemplo de entrada con un bucle FOR
 entrada_ejemplo = """ 
 
-bool a = true
-
-NORTE(a){
-	dracarys("Verdadero")
-}SUR{
-	dracarys("Falso")
-}ENDNORTE
-
+espada [] a = {1,1,1,1,1}
 
 """
 

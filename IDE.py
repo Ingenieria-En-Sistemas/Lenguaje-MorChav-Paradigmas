@@ -11,6 +11,7 @@ customtkinter.set_default_color_theme("dark-blue")
 
 
 def execute_expression():
+    output_text.delete("1.0", "end")
     input_expr = input_text.get("1.0", "end-1c")
     try:
         tokens = lexer(input_expr)

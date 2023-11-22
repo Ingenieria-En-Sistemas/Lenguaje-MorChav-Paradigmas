@@ -159,18 +159,28 @@ def evaluate_single(node):
         user_input = evaluate_single(node.children[3])
     # Utiliza la función RAVEN_value para procesar el valor de USERINPUT
         variables[variable_name] = user_input
+    if node.type == "VARIABLE_DECLARATION":
+        # Si es una declaración de variable, almacena el valor en el diccionario
+        if (
+                len(node.children) == 4
+                and node.children[0].type == "TYPE"
+                and node.children[2].type == "ASSIGN"
+        ):
+            variable_name = node.children[1].value
+
+            if node.children[0].value.endswith("[]"):
+                # Handle array declaration
+                array_values = [evaluate_single(value) for value in node.children[3].children]
+                variables[variable_name] = array_values
+            else:
+                # Handle regular variable declaration
+                variable_value = evaluate_single(node.children[3])
+                variables[variable_name] = variable_value
     return None
 
 
 program = """
-bool a = false
-
-NORTE(2==2){
-a = true
-	dracarys(a)
-}SUR{
-	dracarys(a)
-}ENDNORTE
+espada [] a = {1,1,1,1,1}
 
 """
 tokens = lexer(program)

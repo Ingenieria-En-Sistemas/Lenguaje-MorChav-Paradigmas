@@ -516,23 +516,3 @@ def print_ast(node, level=0):
             print_ast(item, level)
     else:
         print("  " * level + str(node))
-
-entrada_ejemplo = """ 
-
-
-ejercito a = {1, 2, 3, 4, 5}
-dracarys(a[1])
-
-"""
-tokens_ejemplo = lexer(entrada_ejemplo)
-if tokens_ejemplo:
-    print("Tokens generados correctamente:")
-    for token in tokens_ejemplo:
-        print(f"Tipo: {token.type}, Valor: {token.value}")
-else:
-    print("Error de sintaxis en la entrada de ejemplo.")
-ast = parse_program(tokens_ejemplo)
-if ast:
-    print("\nÁrbol de sintaxis abstracta (AST):")
-    for node in ast:
-        print_ast(node)

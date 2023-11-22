@@ -121,6 +121,18 @@ dracarys(a)
 """
 lobos a=""
 espada b=0
+ejercito c ={1,2,3,4,5,6,7,8,9,0}
+dracarys("hola")
+camino(b<10){
+    dracarys("mundo")
+    b=b+1
+}endcamino
+viaje(espada i = 0 to 10 kill 1){
+    dracarys(i)
+}
+dracarys("digite una palabra")
+raven(a)
+
 
 """,
         )
@@ -131,6 +143,8 @@ random_titles = [
     "Los dioses no tienen piedad, por eso son dioses. (Cersei Lannister)",
     "Las serpientes enfadadas atacan. Eso hace más fácil aplastar sus cabezas. (Daenerys Targaryen)",
     "Cualquier hombre que deba decir ‘soy el rey’, no es un verdadero rey. (Tywin Lannister)",
+    "El fuego purifica, pero también consume. (Melisandre)",
+    "Los lobos solitarios mueren, pero la manada sobrevive. (Sansa Stark)"
 ]
 
 
@@ -294,3 +308,4 @@ exit_button.pack(side="left", padx=10)
 change_window_title()
 
 app.mainloop()
+

@@ -173,18 +173,3 @@ def evaluate_single(node):
                 variable_value = evaluate_single(node.children[3])
                 variables[variable_name] = variable_value
     return None
-
-
-program = """
-
-ejercito a = {1, 2, 3, 4, 5}
-dracarys(a[2])
-
-"""
-tokens = lexer(program)
-ast = parse_program(tokens)
-
-for line_node in ast:
-    line_result = evaluate_single(line_node)
-    if line_result is not None:
-        print(line_result)

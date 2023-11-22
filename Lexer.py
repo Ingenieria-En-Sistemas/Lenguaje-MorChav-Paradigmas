@@ -1,6 +1,5 @@
 import re
 
-# Lista de tokens
 tokens = [
     ("NUMBER", r"\d+"),
     ("PLUS", r"\+"),
@@ -29,7 +28,7 @@ tokens = [
     ("VIAJE", r"(?i)viaje"),
     ("KILL", r"(?i)kill"),
     ("TO", r"(?i)to"),
-    ("TYPE", r"espada|float|lobos|lealtad|list"),
+    ("TYPE", r"espada|float|lobos|lealtad|ejercito"),
     ("VARIABLE", r"[a-zA-Z_][a-zA-Z0-9_]*"),
     ("EQUALS", r"=="),
     ("ASSIGN", r"="),
@@ -42,18 +41,14 @@ tokens = [
     ("GREATEQUAL", r">="),
 ]
 
-
-# Clase Token para almacenar información sobre cada token
 class Token:
     def __init__(self, token_type, value):
         self.type = token_type
         self.value = value
 
-
-# Función lexer que divide la entrada en tokens
 def lexer(input_string):
     token_list = []
-    input_string = input_string.replace("\n", "")  # Elimina saltos de línea
+    input_string = input_string.replace("\n", "")
     pos = 0
 
     while pos < len(input_string):
@@ -63,7 +58,7 @@ def lexer(input_string):
             match = regex.match(input_string, pos)
             if match:
                 value = match.group(0)
-                if token_type != "WHITESPACE":  # Ignorar espacios en blanco
+                if token_type != "WHITESPACE":
                     token_list.append(Token(token_type, value))
                 pos = match.end()
                 break

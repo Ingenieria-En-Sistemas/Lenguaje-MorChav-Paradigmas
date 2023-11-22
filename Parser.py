@@ -1,11 +1,5 @@
 from Lexer import lexer
 
-
-# Nodos para operadores lógicos
-
-
-
-# Clase Node para construir el árbol de sintaxis abstracta (AST)
 class Node:
     LOGICAL_OPERATORS = {"AND", "OR", "NOT"}
     def __init__(self, type, children=None, value=None):
@@ -93,13 +87,11 @@ def parse_boolean(tokens):
 
 
 def parse_variable_declaration(tokens):
-    var_type = tokens.pop(0).value  # Tipo de variable (list, string, etc.)
-    variable_name = tokens.pop(0).value  # Nombre de la variable
-
+    var_type = tokens.pop(0).value
+    variable_name = tokens.pop(0).value
     if tokens[0].type == "ASSIGN":
         tokens.pop(0)
 
-        # Verifica si la inicialización es una lista
         if tokens[0].type == "LBRACE":
             list_values = parse_list(tokens)
             variables[variable_name] = Node("LIST", value=list_values)
@@ -114,7 +106,6 @@ def parse_variable_declaration(tokens):
                 ],
             )
         else:
-            # Si no es una lista, parsea la expresión normalmente
             value = expression(tokens)
             variables[variable_name] = value
 
@@ -132,22 +123,18 @@ def parse_variable_declaration(tokens):
 
 
 def parse_list_declaration(var_type, variable_name, tokens):
-    tokens.pop(0)  # Consume '{'
+    tokens.pop(0)
 
-    # Parsea la lista de elementos
     list_values = []
     while tokens[0].type != "RBRACE":
         list_element = parse_list_element(tokens)
         list_values.append(list_element)
 
-        # Verifica si hay una coma para procesar múltiples elementos en la lista
         if tokens[0].type == "COMMA":
-            tokens.pop(0)  # Consume la coma
+            tokens.pop(0)
 
-    # Consume '}'
     tokens.pop(0)
 
-    # Asigna la lista a la variable
     variables[variable_name] = Node("LIST", value=list_values)
 
     return Node(
@@ -159,66 +146,6 @@ def parse_list_declaration(var_type, variable_name, tokens):
             Node("LIST", value=list_values),
         ],
     )
-
-
-
-"""
-def parse_variable_declaration(tokens):
-    var_type = tokens.pop(0).value  # Tipo de variable (espada, string, etc.)
-    variable_name = tokens.pop(0).value  # Nombre de la variable
-
-    if tokens[0].type == "ASSIGN":
-        tokens.pop(0)  # Consume '='
-
-        # Verifica si la inicialización es una lista
-        if tokens[0].type == "LBRACE":
-            tokens.pop(0)  # Consume '{'
-
-            # Parsea la lista de enteros
-            list_values = []
-            while tokens[0].type != "RBRACE":
-                if tokens[0].type == "NUMBER":
-                    list_values.append(int(tokens.pop(0).value))
-                elif tokens[0].type == "COMMA":
-                    tokens.pop(0)  # Consume ','
-                else:
-                    raise SyntaxError("Error de sintaxis: Lista mal formada.")
-
-            # Consume '}'
-            tokens.pop(0)
-
-            # Asigna la lista a la variable
-            variables[variable_name] = Node("LIST", value=list_values)
-
-            return Node(
-                "VARIABLE_DECLARATION",
-                children=[
-                    Node("TYPE", value=var_type),
-                    Node("VARIABLE", value=variable_name),
-                    Node("ASSIGN"),
-                    Node("LIST", value=list_values),
-                ],
-            )
-        else:
-            # Si no es una lista, parsea la expresión normalmente
-            value = expression(tokens)
-            variables[variable_name] = value
-
-            return Node(
-                "VARIABLE_DECLARATION",
-                children=[
-                    Node("TYPE", value=var_type),
-                    Node("VARIABLE", value=variable_name),
-                    Node("ASSIGN"),
-                    value,
-                ],
-            )
-    else:
-        raise SyntaxError(
-            "Error de sintaxis: Se esperaba '=' después del nombre de la variable."
-        )
-"""
-
 
 def parse_variable_assignment(tokens):
     variable_name = tokens.pop(0).value
@@ -438,7 +365,6 @@ def multiplication(tokens):
     return left
 
 
-# Función para el símbolo no terminal "factor"
 def factor(tokens):
     if tokens[0].type == "NUMBER":
         return Node("NUMBER", value=int(tokens.pop(0).value))
@@ -478,9 +404,8 @@ def factor(tokens):
         f"Error de sintaxis: Token inesperado '{tokens[0].type}' en factor."
     )
 
-# Nueva función para parsear listas
 def parse_list(tokens):
-    tokens.pop(0)  # Consume '{'
+    tokens.pop(0)
     list_values = []
 
     while tokens and tokens[0].type != "RBRACE":
@@ -488,19 +413,18 @@ def parse_list(tokens):
         list_values.append(list_element.value)
 
         if tokens and tokens[0].type == "COMMA":
-            tokens.pop(0)  # Consume la coma
+            tokens.pop(0)
         else:
             break
 
     if tokens and tokens[0].type == "RBRACE":
-        tokens.pop(0)  # Consume '}'
+        tokens.pop(0)
     else:
-        raise SyntaxError("Error de sintaxis: Falta '}' al final de la lista.")
+        raise SyntaxError("Error de sintaxis: Falta '}' al final del ejercito.")
 
     return list_values
 
 
-# Nueva función para parsear elementos de la lista
 def parse_list_element(tokens):
     if tokens[0].type == "NUMBER":
         return Node("NUMBER", value=int(tokens.pop(0).value))
@@ -510,7 +434,7 @@ def parse_list_element(tokens):
         return parse_boolean(tokens)
     else:
         raise SyntaxError(
-            f"Error de sintaxis: Elemento de lista inesperado '{tokens[0].type}'."
+            f"Error de sintaxis: Elemento de ejercito inesperado '{tokens[0].type}'."
         )
 
 
@@ -519,15 +443,14 @@ def parse_dracarys(tokens):
     if tokens[0].type == "LPAREN":
         tokens.pop(0)
         expression_node = expression(tokens)
-        
-        # Check if there is an index access
+
         if tokens[0].type == "LBRACKET":
-            tokens.pop(0)  # Consume '['
+            tokens.pop(0)
             index_node = expression(tokens)
             if tokens[0].type == "RBRACKET":
-                tokens.pop(0)  # Consume ']'
+                tokens.pop(0)
                 if tokens[0].type == "RPAREN":
-                    tokens.pop(0)  # Consume ')'
+                    tokens.pop(0)
                     result_node = Node("DRACARYS", children=[expression_node, index_node])
                     return result_node
                 else:
@@ -538,8 +461,7 @@ def parse_dracarys(tokens):
                 raise SyntaxError(
                     "Error de sintaxis: Se esperaba ']' después del índice."
                 )
-        
-        # No index access, continue as before
+
         if tokens[0].type == "RPAREN":
             tokens.pop(0)
             result_node = Node("DRACARYS", children=[expression_node])
@@ -598,7 +520,7 @@ def print_ast(node, level=0):
 entrada_ejemplo = """ 
 
 
-list a = {1, 2, 3, 4, 5}
+ejercito a = {1, 2, 3, 4, 5}
 dracarys(a[1])
 
 """

@@ -110,10 +110,8 @@ def evaluate_single(node):
     elif node.type == "DRACARYS":
         if node.children:
             dracarys_content = evaluate_single(node.children[0])
-            # Check if the content is a list and there is an index
             if isinstance(dracarys_content, list) and len(node.children) > 1:
                 index = evaluate_single(node.children[1])
-                # Check if the index is valid
                 if isinstance(index, int) and 0 <= index < len(dracarys_content):
                     return dracarys_content[index]
                 else:
@@ -179,7 +177,7 @@ def evaluate_single(node):
 
 program = """
 
-list a = {1, 2, 3, 4, 5}
+ejercito a = {1, 2, 3, 4, 5}
 dracarys(a[2])
 
 """

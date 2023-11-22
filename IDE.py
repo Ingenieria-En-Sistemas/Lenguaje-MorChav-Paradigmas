@@ -35,12 +35,11 @@ def execute_expression():
 
 
 
-def clear_input():   # Clear the variables
+def clear_input():
     input_text.delete("1.0", "end")
     output_text.configure(state="normal")
     output_text.delete("1.0", "end")
     output_text.configure(state="disabled")
-
 
 
 def add_selected_option_to_input_text():
@@ -58,7 +57,7 @@ def add_selected_option_to_input_text():
         input_text.insert("end", f"""VIAJE(espada i = 1 to 10 kill 2)
     dracarys(i*2)""")
     elif selected_option == "PRINT":
-        input_text.insert("end", f"""dracarys("Hola mundo")""")
+        input_text.insert("end", """dracarys("Hola mundo")""")
     elif selected_option == "WHILE":
         input_text.insert(
             "end",
@@ -95,6 +94,34 @@ a = true
 }SUR{
 	dracarys(a)
 }ENDNORTE
+""",
+        )
+    elif selected_option == "LIST":
+        input_text.insert(
+            "end",
+            """ejercito a ={1,2,3,4,5,6,7,8,9,0}
+dracarys(a[5])
+viaje(espada i = 0 to 10 kill 1)
+    dracarys(i)
+            """,
+        )
+    elif selected_option == "ENTRADA_DE_TEXTO":
+        input_text.insert(
+            "end",
+            """lobos a=""
+dracarys("digite una palabra")
+raven(a)
+dracarys("La palabra es: ")
+dracarys(a)
+            """,
+        )
+    elif selected_option == "PALABRAS_RESERVADAS":
+        input_text.insert(
+            "end",
+"""
+lobos a=""
+espada b=0
+
 """,
         )
 
@@ -156,7 +183,7 @@ input_text = customtkinter.CTkTextbox(app, wrap=customtkinter.WORD, height=250)
 input_text.configure(font=("Consolas", 17), undo=True)
 input_text.pack(padx=10, pady=(10, 5), fill="both")
 
-options = ["IF", "FOR", "PRINT", "WHILE", "BOOLEAN", "FLOAT", "LOGICAL_OPERATORS", "INT"]
+options = ["IF", "FOR", "PRINT", "WHILE", "BOOLEAN", "LIST", "LOGICAL_OPERATORS", "PALABRAS_RESERVADAS", "ENTRADA_DE_TEXTO"]
 combobox = customtkinter.CTkComboBox(
     option_container, height=55, width=160, values=options
 )

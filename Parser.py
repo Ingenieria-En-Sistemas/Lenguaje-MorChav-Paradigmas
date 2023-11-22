@@ -1,6 +1,13 @@
 from Lexer import lexer
 
+
+# Nodos para operadores lógicos
+
+
+
+# Clase Node para construir el árbol de sintaxis abstracta (AST)
 class Node:
+    LOGICAL_OPERATORS = {"AND", "OR", "NOT"}
     def __init__(self, type, children=None, value=None):
         self.type = type
         if children:
@@ -86,8 +93,11 @@ def parse_boolean(tokens):
 
 
 def parse_variable_declaration(tokens):
-    var_type = tokens.pop(0).value
-    variable_name = tokens.pop(0).value
+    var_type = tokens.pop(
+        0
+    ).value 
+    variable_name = tokens.pop(0).value  
+    
     if tokens[0].type == "ASSIGN":
         tokens.pop(0)
 
@@ -110,20 +120,19 @@ def parse_variable_declaration(tokens):
                 value = parse_boolean(tokens)
             else:
                 raise SyntaxError(
-                    "Error de sintaxis: Se esperaba 'TRUE' o 'FALSE' como valor para 'lealtad'."
+                    f"Error de sintaxis: Se esperaba 'TRUE' o 'FALSE' como valor para 'bool '{variable_name}'."
                 )
         elif var_type == "float":
-            if tokens[0].type == "NUMBER" or tokens[0].type == "FLOAT":
+            if (
+                tokens[0].type == "NUMBER" or tokens[0].type == "FLOAT"
+            ):  
                 value = expression(tokens)
             else:
                 raise SyntaxError(
                     "Error de sintaxis: Se esperaba un número o decimal como valor para 'float'."
                 )
         elif var_type == "char":
-            if (
-                tokens[0].type == "STRING"
-                and len(tokens[0].value) == 1
-            ):
+            if tokens[0].type == "STRING" and len(tokens[0].value) == 1:
                 value = expression(tokens)
             else:
                 raise SyntaxError("Error de sintaxis: Se esperaba un carácter entre comillas como valor para 'char'.")
@@ -143,6 +152,63 @@ def parse_variable_declaration(tokens):
     else:
         raise SyntaxError("Error de sintaxis: Se esperaba '=' después del nombre de la variable.")
 
+
+"""
+def parse_variable_declaration(tokens):
+    var_type = tokens.pop(0).value  # Tipo de variable (espada, string, etc.)
+    variable_name = tokens.pop(0).value  # Nombre de la variable
+
+    if tokens[0].type == "ASSIGN":
+        tokens.pop(0)  # Consume '='
+
+        # Verifica si la inicialización es una lista
+        if tokens[0].type == "LBRACE":
+            tokens.pop(0)  # Consume '{'
+
+            # Parsea la lista de enteros
+            list_values = []
+            while tokens[0].type != "RBRACE":
+                if tokens[0].type == "NUMBER":
+                    list_values.append(int(tokens.pop(0).value))
+                elif tokens[0].type == "COMMA":
+                    tokens.pop(0)  # Consume ','
+                else:
+                    raise SyntaxError("Error de sintaxis: Lista mal formada.")
+
+            # Consume '}'
+            tokens.pop(0)
+
+            # Asigna la lista a la variable
+            variables[variable_name] = Node("LIST", value=list_values)
+
+            return Node(
+                "VARIABLE_DECLARATION",
+                children=[
+                    Node("TYPE", value=var_type),
+                    Node("VARIABLE", value=variable_name),
+                    Node("ASSIGN"),
+                    Node("LIST", value=list_values),
+                ],
+            )
+        else:
+            # Si no es una lista, parsea la expresión normalmente
+            value = expression(tokens)
+            variables[variable_name] = value
+
+            return Node(
+                "VARIABLE_DECLARATION",
+                children=[
+                    Node("TYPE", value=var_type),
+                    Node("VARIABLE", value=variable_name),
+                    Node("ASSIGN"),
+                    value,
+                ],
+            )
+    else:
+        raise SyntaxError(
+            "Error de sintaxis: Se esperaba '=' después del nombre de la variable."
+        )
+"""
 
 
 def parse_variable_assignment(tokens):
@@ -279,9 +345,6 @@ def input_statement(tokens):
         )
 
 
-
-
-
 def check_variable_type(variable_name, user_input):
     if variable_name in variables:
         variable_type = variables[variable_name].type
@@ -298,9 +361,6 @@ def check_variable_type(variable_name, user_input):
     )
 
 
-
-
-
 def parse_else_statement(tokens):
     tokens.pop(0)
     else_statement = parse_single_statement(tokens)
@@ -308,9 +368,24 @@ def parse_else_statement(tokens):
 
 
 def expression(tokens):
-    left = equality(tokens)
+    left = logical_or(tokens)
     return left
 
+def logical_or(tokens):
+    left = logical_and(tokens)
+    while tokens and tokens[0].type == "OR":
+        op = tokens.pop(0)
+        right = logical_and(tokens)
+        left = Node(op.type, [left, right])
+    return left
+
+def logical_and(tokens):
+    left = equality(tokens)
+    while tokens and tokens[0].type == "AND":
+        op = tokens.pop(0)
+        right = equality(tokens)
+        left = Node(op.type, [left, right])
+    return left
 
 def equality(tokens):
     left = comparison(tokens)
@@ -456,11 +531,14 @@ def print_ast(node, level=0):
         print("  " * level + str(node))
 
 entrada_ejemplo = """ 
-lealtad a = true
-NORTE(a){
-	dracarys("Verdadero")
+
+bool a = false
+
+NORTE(2==2 and 3==3){
+a = true
+	dracarys(a)
 }SUR{
-	dracarys("Falso")
+	dracarys(a)
 }ENDNORTE
 """
 tokens_ejemplo = lexer(entrada_ejemplo)

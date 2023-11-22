@@ -4,13 +4,14 @@ from customtkinter import CTkImage
 from PIL import Image
 from Lexer import lexer
 from Parser import parse_program
-from Interpreter import evaluate,evaluate_single
+from Interpreter import evaluate_single
 
 customtkinter.set_appearance_mode("System")
 customtkinter.set_default_color_theme("dark-blue")
 
 
 def execute_expression():
+    output_text.delete("1.0", "end")
     input_expr = input_text.get("1.0", "end-1c")
     try:
         tokens = lexer(input_expr)
@@ -30,7 +31,7 @@ def execute_expression():
             output_text.configure(state="disabled")
     except Exception as e:
         output_text.configure(state="normal")
-        output_text.insert("end", f"Error: {e}\n")
+        output_text.insert("end", f"Algo salió mal.\n->  {e}\n")
         output_text.configure(state="disabled")
 
 
@@ -79,6 +80,20 @@ a = true
     dracarys(a)
 }SUR{
     dracarys(a)
+}ENDNORTE
+""",
+        )
+    elif selected_option == "LOGICAL_OPERATORS":
+        input_text.insert(
+            "end",
+"""
+bool a = false
+
+NORTE(3==1 and (2==2 or 4==4)){
+a = true
+	dracarys(a)
+}SUR{
+	dracarys(a)
 }ENDNORTE
 """,
         )
@@ -141,7 +156,7 @@ input_text = customtkinter.CTkTextbox(app, wrap=customtkinter.WORD, height=250)
 input_text.configure(font=("Consolas", 17), undo=True)
 input_text.pack(padx=10, pady=(10, 5), fill="both")
 
-options = ["IF", "FOR", "PRINT", "WHILE", "BOOLEAN", "FLOAT", "STRING", "INT"]
+options = ["IF", "FOR", "PRINT", "WHILE", "BOOLEAN", "FLOAT", "LOGICAL_OPERATORS", "INT"]
 combobox = customtkinter.CTkComboBox(
     option_container, height=55, width=160, values=options
 )

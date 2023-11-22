@@ -84,6 +84,20 @@ a = true
 }ENDNORTE
 """,
         )
+    elif selected_option == "LOGICAL_OPERATORS":
+        input_text.insert(
+            "end",
+"""
+bool a = false
+
+NORTE(3==1 and (2==2 or 4==4)){
+a = true
+	dracarys(a)
+}SUR{
+	dracarys(a)
+}ENDNORTE
+""",
+        )
 
 
 # Lista de títulos aleatorios
@@ -151,7 +165,7 @@ input_text = customtkinter.CTkTextbox(app, wrap=customtkinter.WORD, height=250)
 input_text.configure(font=("Consolas", 17), undo=True)
 input_text.pack(padx=10, pady=(10, 5), fill="both")
 
-options = ["IF", "FOR", "PRINT", "WHILE", "BOOLEAN", "FLOAT", "STRING", "INT"]
+options = ["IF", "FOR", "PRINT", "WHILE", "BOOLEAN", "FLOAT", "LOGICAL_OPERATORS", "INT"]
 combobox = customtkinter.CTkComboBox(
     option_container, height=55, width=160, values=options
 )

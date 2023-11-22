@@ -2,8 +2,13 @@
 from Lexer import lexer
 
 
+# Nodos para operadores lógicos
+
+
+
 # Clase Node para construir el árbol de sintaxis abstracta (AST)
 class Node:
+    LOGICAL_OPERATORS = {"AND", "OR", "NOT"}
     def __init__(self, type, children=None, value=None):
         self.type = type
         if children:
@@ -105,7 +110,9 @@ def parse_boolean(tokens):
 
 
 def parse_variable_declaration(tokens):
-    var_type = tokens.pop(0).value  # Tipo de variable (espada, string, bool, float, char, etc.)
+    var_type = tokens.pop(
+        0
+    ).value  # Tipo de variable (espada, string, bool, float, char, etc.)
     variable_name = tokens.pop(0).value  # Nombre de la variable
     if tokens[0].type == "ASSIGN":
         tokens.pop(0)  # Consume '='
@@ -132,17 +139,16 @@ def parse_variable_declaration(tokens):
                     "Error de sintaxis: Se esperaba 'TRUE' o 'FALSE' como valor para 'bool'."
                 )
         elif var_type == "float":
-            if tokens[0].type == "NUMBER" or tokens[0].type == "FLOAT":  # Permitir números y decimales
+            if (
+                tokens[0].type == "NUMBER" or tokens[0].type == "FLOAT"
+            ):  # Permitir números y decimales
                 value = expression(tokens)
             else:
                 raise SyntaxError(
                     "Error de sintaxis: Se esperaba un número o decimal como valor para 'float'."
                 )
         elif var_type == "char":
-            if (
-                tokens[0].type == "STRING"
-                and len(tokens[0].value) == 1
-            ):
+            if tokens[0].type == "STRING" and len(tokens[0].value) == 1:
                 value = expression(tokens)
             else:
                 raise SyntaxError(
@@ -166,6 +172,8 @@ def parse_variable_declaration(tokens):
         raise SyntaxError(
             "Error de sintaxis: Se esperaba '=' después del nombre de la variable."
         )
+
+
 """
 def parse_variable_declaration(tokens):
     var_type = tokens.pop(0).value  # Tipo de variable (espada, string, etc.)
@@ -397,9 +405,6 @@ def input_statement(tokens):
         )
 
 
-
-
-
 def check_variable_type(variable_name, user_input):
     # Verifica si la variable ya ha sido declarada
     if variable_name in variables:
@@ -421,20 +426,32 @@ def check_variable_type(variable_name, user_input):
     )
 
 
-
-
-
 def parse_else_statement(tokens):
     tokens.pop(0)  # Consume 'ELSE'
     else_statement = parse_single_statement(tokens)
     return Node("SUR", [else_statement])
 
 
-# Función para el símbolo no terminal "expresión"
+# Actualiza la función expression para incluir operadores lógicos
 def expression(tokens):
-    left = equality(tokens)
+    left = logical_or(tokens)
     return left
 
+def logical_or(tokens):
+    left = logical_and(tokens)
+    while tokens and tokens[0].type == "OR":
+        op = tokens.pop(0)
+        right = logical_and(tokens)
+        left = Node(op.type, [left, right])
+    return left
+
+def logical_and(tokens):
+    left = equality(tokens)
+    while tokens and tokens[0].type == "AND":
+        op = tokens.pop(0)
+        right = equality(tokens)
+        left = Node(op.type, [left, right])
+    return left
 
 # Función para el símbolo no terminal "igualdad"
 def equality(tokens):
@@ -607,7 +624,15 @@ def print_ast(node, level=0):
 # Ejemplo de entrada con un bucle FOR
 entrada_ejemplo = """ 
 
-espada [] a = {1,1,1,1,1}
+bool a = false
+
+NORTE(2==2 and 3==3){
+a = true
+	dracarys(a)
+}SUR{
+	dracarys(a)
+}ENDNORTE
+
 
 """
 

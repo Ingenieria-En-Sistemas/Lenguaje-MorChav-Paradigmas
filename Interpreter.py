@@ -180,7 +180,14 @@ def evaluate_single(node):
 
 
 program = """
-espada [] a = {1,1,1,1,1}
+bool a = false
+
+NORTE(2==3){
+a = true
+	dracarys(a)
+}SUR{
+	dracarys(a)
+}ENDNORTE
 
 """
 tokens = lexer(program)

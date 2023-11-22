@@ -136,7 +136,7 @@ def parse_variable_declaration(tokens):
                 value = parse_boolean(tokens)
             else:
                 raise SyntaxError(
-                    "Error de sintaxis: Se esperaba 'TRUE' o 'FALSE' como valor para 'bool'."
+                    f"Error de sintaxis: Se esperaba 'TRUE' o 'FALSE' como valor para 'bool '{variable_name}'."
                 )
         elif var_type == "float":
             if (

@@ -105,10 +105,11 @@ def parse_boolean(tokens):
 
 
 def parse_variable_declaration(tokens):
-    var_type = tokens.pop(0).value  # Tipo de variable (espada, string, etc.)
+    var_type = tokens.pop(0).value  # Tipo de variable (espada, string, bool, float, char, etc.)
     variable_name = tokens.pop(0).value  # Nombre de la variable
     if tokens[0].type == "ASSIGN":
         tokens.pop(0)  # Consume '='
+
         if var_type == "espada":
             if tokens[0].type == "NUMBER":
                 value = expression(tokens)
@@ -124,8 +125,29 @@ def parse_variable_declaration(tokens):
                     "Error de sintaxis: Se esperaba una cadena entre comillas como valor para 'LOBOS'."
                 )
         elif var_type == "bool":
-            # Agrega la lógica para bool aquí si es necesario
-            pass
+            if tokens[0].type == "TRUE" or tokens[0].type == "FALSE":
+                value = parse_boolean(tokens)
+            else:
+                raise SyntaxError(
+                    "Error de sintaxis: Se esperaba 'TRUE' o 'FALSE' como valor para 'bool'."
+                )
+        elif var_type == "float":
+            if tokens[0].type == "NUMBER" or tokens[0].type == "FLOAT":  # Permitir números y decimales
+                value = expression(tokens)
+            else:
+                raise SyntaxError(
+                    "Error de sintaxis: Se esperaba un número o decimal como valor para 'float'."
+                )
+        elif var_type == "char":
+            if (
+                tokens[0].type == "STRING"
+                and len(tokens[0].value) == 1
+            ):
+                value = expression(tokens)
+            else:
+                raise SyntaxError(
+                    "Error de sintaxis: Se esperaba un carácter entre comillas como valor para 'char'."
+                )
         else:
             # Agrega la lógica para otros tipos aquí si es necesario
             pass
@@ -144,6 +166,7 @@ def parse_variable_declaration(tokens):
         raise SyntaxError(
             "Error de sintaxis: Se esperaba '=' después del nombre de la variable."
         )
+
 
 
 def parse_variable_assignment(tokens):
@@ -529,14 +552,15 @@ def print_ast(node, level=0):
 # Ejemplo de entrada con un bucle FOR
 entrada_ejemplo = """ 
 
-lobos i = ""
-espada a = 0
+bool a = true
 
-dracarys("Digite el numero")
-RAVEN(i)
+NORTE(a){
+	dracarys("Verdadero")
+}SUR{
+	dracarys("Falso")
+}ENDNORTE
 
-dracarys("Digite el numero")
-RAVEN(a)
+
 """
 
 # Llama al lexer con el ejemplo de entrada

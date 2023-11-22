@@ -59,6 +59,20 @@ def add_selected_option_to_input_text():
             "end",
             """\nespada i = 1 while(i<10){\n\tDRACARYS("Menor que 10")\n i=i+1\n}endwhile""",
         )
+    elif selected_option == "BOOLEAN":
+        input_text.insert(
+            "end",
+"""
+bool a = false
+
+NORTE(2==2){
+a = true
+    dracarys(a)
+}SUR{
+    dracarys(a)
+}ENDNORTE
+""",
+        )
 
 
 # Lista de títulos aleatorios
@@ -126,10 +140,11 @@ input_text = customtkinter.CTkTextbox(app, wrap=customtkinter.WORD, height=250)
 input_text.configure(font=("Consolas", 17), undo=True)
 input_text.pack(padx=10, pady=(10, 5), fill="both")
 
-options = ["IF", "FOR", "PRINT", "WHILE", "-"]
+options = ["IF", "FOR", "PRINT", "WHILE", "BOOLEAN", "FLOAT", "STRING", "INT"]
 combobox = customtkinter.CTkComboBox(
     option_container, height=55, width=160, values=options
 )
+
 combobox.configure(font=("Consolas", 17))
 combobox.pack(side="left", padx=20)
 combobox.set("Opciones")

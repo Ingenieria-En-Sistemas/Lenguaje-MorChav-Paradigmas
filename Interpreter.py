@@ -31,6 +31,23 @@ def evaluate_single(node):
         left = evaluate_single(node.children[0])
         right = evaluate_single(node.children[1])
         return left + right
+    if node.type == "BOOLEAN":
+        return node.value  # Devuelve directamente el valor booleano
+    if node.type == "NOT":
+        operand = evaluate_single(node.children[0])
+        return not operand
+    if node.type == "AND":
+        left = evaluate_single(node.children[0])
+        right = evaluate_single(node.children[1])
+        return left and right
+    if node.type == "OR":
+        left = evaluate_single(node.children[0])
+        right = evaluate_single(node.children[1])
+        return left or right
+    if node.type == "CHAR":
+        return node.value  # Devuelve directamente el valor de caracter
+    if node.type == "FLOAT":
+        return node.value  # Devuelve directamente el valor de punto flotante
     if node.type == "USERINPUT":
         user_input = input("RAVEN: ")
         return user_input
@@ -146,18 +163,14 @@ def evaluate_single(node):
 
 
 program = """
+bool a = false
 
-lobos i = ""
-espada a = 0
-
-dracarys("Digite el numero")
-RAVEN(i)
-
-dracarys("Digite el numero")
-RAVEN(a)
-
-dracarys(i)
-dracarys(a)
+NORTE(2==2){
+a = true
+	dracarys(a)
+}SUR{
+	dracarys(a)
+}ENDNORTE
 
 """
 tokens = lexer(program)

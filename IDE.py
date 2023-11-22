@@ -48,16 +48,40 @@ def add_selected_option_to_input_text():
     if selected_option == "IF":
         input_text.insert(
             "end",
-            """NORTE(2!=2){\n\tdracarys("Verdadero")\n}SUR{\n\tdracarys("Falso")\n}ENDNORTE""",
+            """NORTE(2!=2){
+    dracarys("Verdadero")
+}SUR{
+    dracarys("Falso")
+}ENDNORTE""",
         )
     elif selected_option == "FOR":
-        input_text.insert("end", f"VIAJE(espada i = 1 to 10 step 2) dracarys(i*2)")
+        input_text.insert("end", f"""VIAJE(espada i = 1 to 10 step 2)
+    dracarys(i*2)""")
     elif selected_option == "PRINT":
         input_text.insert("end", f"""dracarys("Hola mundo")""")
     elif selected_option == "WHILE":
         input_text.insert(
             "end",
-            """\nespada i = 1 CAMINO(i<10){\n\tDRACARYS("Menor que 10")\n i=i+1\n}ENDCAMINO""",
+            """ 
+espada i = 1
+while(i<10){
+    DRACARYS("Menor que 10")
+    i=i+1
+}endwhile""",
+        )
+    elif selected_option == "BOOLEAN":
+        input_text.insert(
+            "end",
+"""
+bool a = false
+
+NORTE(2==2){
+a = true
+    dracarys(a)
+}SUR{
+    dracarys(a)
+}ENDNORTE
+""",
         )
 
 
@@ -126,10 +150,11 @@ input_text = customtkinter.CTkTextbox(app, wrap=customtkinter.WORD, height=250)
 input_text.configure(font=("Consolas", 17), undo=True)
 input_text.pack(padx=10, pady=(10, 5), fill="both")
 
-options = ["IF", "FOR", "PRINT", "WHILE", "-"]
+options = ["IF", "FOR", "PRINT", "WHILE", "BOOLEAN", "FLOAT", "STRING", "INT"]
 combobox = customtkinter.CTkComboBox(
     option_container, height=55, width=160, values=options
 )
+
 combobox.configure(font=("Consolas", 17))
 combobox.pack(side="left", padx=20)
 combobox.set("Opciones")

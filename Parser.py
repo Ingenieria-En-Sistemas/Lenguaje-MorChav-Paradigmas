@@ -191,7 +191,7 @@ def parse_for_statement(tokens):
                 tokens.pop(0)
                 final_value = expression(tokens)
                 step = None
-                if tokens[0].type == "STEP":
+                if tokens[0].type == "KILL":
                     tokens.pop(0)
                     step = expression(tokens)
 
@@ -210,7 +210,7 @@ def parse_for_statement(tokens):
                                 ],
                             ),
                             Node("FINAL_VALUE", value=final_value.value),
-                            Node("STEP", value=step.value if step else None),
+                            Node("KILL", value=step.value if step else None),
                             body,
                         ],
                     )

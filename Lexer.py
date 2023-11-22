@@ -22,7 +22,7 @@ tokens = [
     ("ENDCAMINO", "(?i)endcamino"),
     ("SUR", r"(?i)sur"),
     ("VIAJE", r"(?i)viaje"),
-    ("STEP", r"(?i)step"),
+    ("KILL", r"(?i)kill"),
     ("TO", r"(?i)to"),
     ("TYPE", r"espada|float|lobos|lealtad"),
     ("VARIABLE", r"[a-zA-Z_][a-zA-Z0-9_]*"),

@@ -52,9 +52,9 @@ def add_selected_option_to_input_text():
 }SUR{
     dracarys("Falso")
 }ENDNORTE""",
-        )
+        )   
     elif selected_option == "FOR":
-        input_text.insert("end", f"""VIAJE(espada i = 1 to 10 step 2)
+        input_text.insert("end", f"""VIAJE(espada i = 1 to 10 kill 2)
     dracarys(i*2)""")
     elif selected_option == "PRINT":
         input_text.insert("end", f"""dracarys("Hola mundo")""")

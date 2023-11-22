@@ -4,8 +4,7 @@ from customtkinter import CTkImage
 from PIL import Image
 from Lexer import lexer
 from Parser import parse_program
-from Interpreter import evaluate_single
-
+from Interpreter import evaluate_single, variables
 customtkinter.set_appearance_mode("System")
 customtkinter.set_default_color_theme("dark-blue")
 
@@ -37,11 +36,12 @@ def execute_expression():
 
 
 
-def clear_input():
+def clear_input():   # Clear the variables
     input_text.delete("1.0", "end")
     output_text.configure(state="normal")
     output_text.delete("1.0", "end")
     output_text.configure(state="disabled")
+
 
 
 def add_selected_option_to_input_text():

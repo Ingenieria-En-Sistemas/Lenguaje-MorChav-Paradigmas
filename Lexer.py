@@ -3,7 +3,6 @@ import re
 # Lista de tokens
 tokens = [
     ("NUMBER", r"\d+"),
-    ("LIST", r"\[([0-9]+(?:,[0-9]+)*)?\]"),
     ("PLUS", r"\+"),
     ("ENDNORTE", r"(?i)endnorte"),
     ("MINUS", r"-"),
@@ -13,6 +12,8 @@ tokens = [
     ("AND", r"(?i)and"),
     ("OR", r"(?i)or"),
     ("DIVIDE", r"/"),
+    ("LBRACKET", r"\["),
+    ("RBRACKET", r"\]"),
     ("LPAREN", r"\("),
     ("RPAREN", r"\)"),
     ("LBRACE", r"\{"),
@@ -28,7 +29,7 @@ tokens = [
     ("VIAJE", r"(?i)viaje"),
     ("STEP", r"(?i)step"),
     ("TO", r"(?i)to"),
-    ("TYPE", r"espada|float|lobos|bool"),
+    ("TYPE", r"espada|float|lobos|bool|list"),
     ("VARIABLE", r"[a-zA-Z_][a-zA-Z0-9_]*"),
     ("EQUALS", r"=="),
     ("ASSIGN", r"="),

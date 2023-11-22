@@ -5,7 +5,6 @@ from Parser import parse_program
 variables = {}
 
 
-
 def evaluate(nodes):
     all_results = []
     for node in nodes:
@@ -32,6 +31,8 @@ def evaluate_single(node):
         right = evaluate_single(node.children[1])
         return left + right
     if node.type == "BOOLEAN":
+        return node.value
+    if node.type == "LIST":
         return node.value
     if node.type == "NOT":
         operand = evaluate_single(node.children[0])
@@ -93,9 +94,7 @@ def evaluate_single(node):
 
     if node.type == "VIAJE":
         variable_name = node.children[0].children[1].value
-        initial_value = (
-            node.children[0].children[2].value
-        )
+        initial_value = node.children[0].children[2].value
         final_value = node.children[1].value
         step = node.children[2].value
         body = node.children[3]
@@ -108,11 +107,19 @@ def evaluate_single(node):
             results.append(result)
 
         return results
-
     elif node.type == "DRACARYS":
         if node.children:
             dracarys_content = evaluate_single(node.children[0])
-            return dracarys_content
+            # Check if the content is a list and there is an index
+            if isinstance(dracarys_content, list) and len(node.children) > 1:
+                index = evaluate_single(node.children[1])
+                # Check if the index is valid
+                if isinstance(index, int) and 0 <= index < len(dracarys_content):
+                    return dracarys_content[index]
+                else:
+                    print(f"Error: Index {index} out of range.")
+            else:
+                return dracarys_content
         elif node.value:
             return evaluate_single(node.value)
     if node.type == "LOBOS":
@@ -152,34 +159,28 @@ def evaluate_single(node):
         user_input = evaluate_single(node.children[3])
         variables[variable_name] = user_input
     if node.type == "VARIABLE_DECLARATION":
-        # Si es una declaración de variable, almacena el valor en el diccionario
         if (
-                len(node.children) == 4
-                and node.children[0].type == "TYPE"
-                and node.children[2].type == "ASSIGN"
+            len(node.children) == 4
+            and node.children[0].type == "TYPE"
+            and node.children[2].type == "ASSIGN"
         ):
             variable_name = node.children[1].value
 
             if node.children[0].value.endswith("[]"):
-                # Handle array declaration
-                array_values = [evaluate_single(value) for value in node.children[3].children]
+                array_values = [
+                    evaluate_single(value) for value in node.children[3].children
+                ]
                 variables[variable_name] = array_values
             else:
-                # Handle regular variable declaration
                 variable_value = evaluate_single(node.children[3])
                 variables[variable_name] = variable_value
     return None
 
 
 program = """
-lealtad a = false
 
-NORTE(2==3){
-a = true
-	dracarys(a)
-}SUR{
-	dracarys(a)
-}ENDNORTE
+list a = {1, 2, 3, 4, 5}
+dracarys(a[2])
 
 """
 tokens = lexer(program)

@@ -93,64 +93,73 @@ def parse_boolean(tokens):
 
 
 def parse_variable_declaration(tokens):
-    var_type = tokens.pop(
-        0
-    ).value 
-    variable_name = tokens.pop(0).value  
-    
+    var_type = tokens.pop(0).value  # Tipo de variable (list, string, etc.)
+    variable_name = tokens.pop(0).value  # Nombre de la variable
+
     if tokens[0].type == "ASSIGN":
         tokens.pop(0)
 
-        if var_type == "espada":
-            if tokens[0].type == "NUMBER":
-                value = expression(tokens)
-            else:
-                raise SyntaxError(
-                    "Error de sintaxis: Se esperaba un número entero como valor para 'espada'."
-                )
-        elif var_type == "lobos":
-            if tokens[0].type == "STRING":
-                value = expression(tokens)
-            else:
-                raise SyntaxError(
-                    "Error de sintaxis: Se esperaba una cadena entre comillas como valor para 'LOBOS'."
-                )
-        elif var_type == "lealtad":
-            if tokens[0].type == "TRUE" or tokens[0].type == "FALSE":
-                value = parse_boolean(tokens)
-            else:
-                raise SyntaxError(
-                    f"Error de sintaxis: Se esperaba 'TRUE' o 'FALSE' como valor para 'bool '{variable_name}'."
-                )
-        elif var_type == "float":
-            if (
-                tokens[0].type == "NUMBER" or tokens[0].type == "FLOAT"
-            ):  
-                value = expression(tokens)
-            else:
-                raise SyntaxError(
-                    "Error de sintaxis: Se esperaba un número o decimal como valor para 'float'."
-                )
-        elif var_type == "char":
-            if tokens[0].type == "STRING" and len(tokens[0].value) == 1:
-                value = expression(tokens)
-            else:
-                raise SyntaxError("Error de sintaxis: Se esperaba un carácter entre comillas como valor para 'char'.")
-        else:
-            pass
+        # Verifica si la inicialización es una lista
+        if tokens[0].type == "LBRACE":
+            list_values = parse_list(tokens)
+            variables[variable_name] = Node("LIST", value=list_values)
 
-        variables[variable_name] = value
-        return Node(
-            "VARIABLE_DECLARATION",
-            children=[
-                Node("TYPE", value=var_type),
-                Node("VARIABLE", value=variable_name),
-                Node("ASSIGN"),
-                value,
-            ],
-        )
+            return Node(
+                "VARIABLE_DECLARATION",
+                children=[
+                    Node("TYPE", value=var_type),
+                    Node("VARIABLE", value=variable_name),
+                    Node("ASSIGN"),
+                    Node("LIST", value=list_values),
+                ],
+            )
+        else:
+            # Si no es una lista, parsea la expresión normalmente
+            value = expression(tokens)
+            variables[variable_name] = value
+
+            return Node(
+                "VARIABLE_DECLARATION",
+                children=[
+                    Node("TYPE", value=var_type),
+                    Node("VARIABLE", value=variable_name),
+                    Node("ASSIGN"),
+                    value,
+                ],
+            )
     else:
         raise SyntaxError("Error de sintaxis: Se esperaba '=' después del nombre de la variable.")
+
+
+def parse_list_declaration(var_type, variable_name, tokens):
+    tokens.pop(0)  # Consume '{'
+
+    # Parsea la lista de elementos
+    list_values = []
+    while tokens[0].type != "RBRACE":
+        list_element = parse_list_element(tokens)
+        list_values.append(list_element)
+
+        # Verifica si hay una coma para procesar múltiples elementos en la lista
+        if tokens[0].type == "COMMA":
+            tokens.pop(0)  # Consume la coma
+
+    # Consume '}'
+    tokens.pop(0)
+
+    # Asigna la lista a la variable
+    variables[variable_name] = Node("LIST", value=list_values)
+
+    return Node(
+        "VARIABLE_DECLARATION",
+        children=[
+            Node("TYPE", value=var_type),
+            Node("VARIABLE", value=variable_name),
+            Node("ASSIGN"),
+            Node("LIST", value=list_values),
+        ],
+    )
+
 
 
 """
@@ -428,6 +437,8 @@ def multiplication(tokens):
         left = Node(op.type, [left, right])
     return left
 
+
+# Función para el símbolo no terminal "factor"
 def factor(tokens):
     if tokens[0].type == "NUMBER":
         return Node("NUMBER", value=int(tokens.pop(0).value))
@@ -459,33 +470,87 @@ def factor(tokens):
     elif tokens[0].type == "VARIABLE":
         if tokens[1].type == "ASSIGN":
             return parse_variable_assignment(tokens)
+        elif tokens[1].type == "LBRACE":
+            return parse_list(tokens)
         else:
             return Node("VARIABLE", value=tokens.pop(0).value)
-    raise SyntaxError(f"Error de sintaxis: Token inesperado '{tokens[0].type}' en factor.")
+    raise SyntaxError(
+        f"Error de sintaxis: Token inesperado '{tokens[0].type}' en factor."
+    )
+
+# Nueva función para parsear listas
+def parse_list(tokens):
+    tokens.pop(0)  # Consume '{'
+    list_values = []
+
+    while tokens and tokens[0].type != "RBRACE":
+        list_element = parse_list_element(tokens)
+        list_values.append(list_element.value)
+
+        if tokens and tokens[0].type == "COMMA":
+            tokens.pop(0)  # Consume la coma
+        else:
+            break
+
+    if tokens and tokens[0].type == "RBRACE":
+        tokens.pop(0)  # Consume '}'
+    else:
+        raise SyntaxError("Error de sintaxis: Falta '}' al final de la lista.")
+
+    return list_values
+
+
+# Nueva función para parsear elementos de la lista
+def parse_list_element(tokens):
+    if tokens[0].type == "NUMBER":
+        return Node("NUMBER", value=int(tokens.pop(0).value))
+    elif tokens[0].type == "STRING":
+        return Node("LOBOS", value=tokens.pop(0).value)
+    elif tokens[0].type == "TRUE" or tokens[0].type == "FALSE":
+        return parse_boolean(tokens)
+    else:
+        raise SyntaxError(
+            f"Error de sintaxis: Elemento de lista inesperado '{tokens[0].type}'."
+        )
+
 
 def parse_dracarys(tokens):
     tokens.pop(0)
     if tokens[0].type == "LPAREN":
         tokens.pop(0)
         expression_node = expression(tokens)
+        
+        # Check if there is an index access
+        if tokens[0].type == "LBRACKET":
+            tokens.pop(0)  # Consume '['
+            index_node = expression(tokens)
+            if tokens[0].type == "RBRACKET":
+                tokens.pop(0)  # Consume ']'
+                if tokens[0].type == "RPAREN":
+                    tokens.pop(0)  # Consume ')'
+                    result_node = Node("DRACARYS", children=[expression_node, index_node])
+                    return result_node
+                else:
+                    raise SyntaxError(
+                        "Error de sintaxis: Se esperaba ')' después del índice."
+                    )
+            else:
+                raise SyntaxError(
+                    "Error de sintaxis: Se esperaba ']' después del índice."
+                )
+        
+        # No index access, continue as before
         if tokens[0].type == "RPAREN":
             tokens.pop(0)
             result_node = Node("DRACARYS", children=[expression_node])
-            if result_node.children[0].value in variables:
-                return result_node
-            else:
-                return result_node
+            return result_node
         else:
-            raise SyntaxError("Error de sintaxis: Se esperaba ')' después de la expresión.")
-    elif tokens[0].type == "STRING":
-        string_node = tokens.pop(0).value
-        return Node("DRACARYS", value=string_node)
-    elif tokens[0].type == "VARIABLE":
-        variable_node = tokens.pop(0).value
-        return Node("DRACARYS", value=variable_node)
-    elif tokens[0].type == "NUMBER":
-        number_node = tokens.pop(0).value
-        return Node("DRACARYS", value=number_node)
+            raise SyntaxError(
+                "Error de sintaxis: Se esperaba ')' después de la expresión."
+            )
+    elif tokens[0].type in ("STRING", "VARIABLE", "NUMBER"):
+        value_node = tokens.pop(0).value
+        return Node("DRACARYS", value=value_node)
     else:
         raise SyntaxError("Error de sintaxis: Se esperaba '(' o una cadena después de 'DRACARYS'.")
 
@@ -532,14 +597,10 @@ def print_ast(node, level=0):
 
 entrada_ejemplo = """ 
 
-bool a = false
 
-NORTE(2==2 and 3==3){
-a = true
-	dracarys(a)
-}SUR{
-	dracarys(a)
-}ENDNORTE
+list a = {1, 2, 3, 4, 5}
+dracarys(a[1])
+
 """
 tokens_ejemplo = lexer(entrada_ejemplo)
 if tokens_ejemplo:
